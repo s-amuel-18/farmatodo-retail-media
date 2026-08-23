@@ -1,0 +1,186 @@
+# Farmatodo Retail Media — Plataforma de Gestión de Campañas
+
+Prototipo funcional para la gestión del ciclo completo de creación, revisión y aprobación de
+campañas de Retail Media (piso de venta y canales digitales), con dos roles con permisos
+diferenciados y trazabilidad completa de cada transición de estado.
+
+## Stack
+
+- **Backend**: NestJS + TypeScript estricto, arquitectura hexagonal (dominio / aplicación /
+  infraestructura), Firestore vía `firebase-admin`.
+- **Frontend**: Next.js (App Router) + TypeScript estricto, arquitectura MVVM (Vista / hook-ViewModel /
+  Service), React Query, react-hook-form.
+- **Dominio compartido**: `packages/types` — tipos y esquemas de validación (zod) usados por ambas apps,
+  sin duplicación.
+- **Auth**: Firebase Authentication (Google Sign-In), rol transportado en un custom claim.
+- **Base de datos**: Firestore, con `firestore.rules` de denegación por defecto.
+
+## Estructura
+
+```
+farmatodo-retail-media/
+├── firestore.rules
+├── firestore.indexes.json
+├── packages/types/src/        # Campaign, User, Approval, esquemas zod, utilidades
+└── apps/
+    ├── backend/src/
+    │   ├── auth/               # FirebaseAuthGuard, RolesGuard, @Roles()
+    │   ├── firebase/            # init de firebase-admin
+    │   └── campaigns/
+    │       ├── domain/          # máquina de estados y cálculo de costo (funciones puras)
+    │       ├── application/     # casos de uso + puertos (interfaces de repositorio)
+    │       └── infrastructure/  # adaptadores Firestore + controller HTTP
+    └── frontend/src/
+        ├── app/                 # routing puro (App Router)
+        ├── views/               # componentes presentacionales
+        ├── view-models/         # hooks: dueños del estado de cada pantalla
+        └── services/            # única capa que habla con la API/Firebase
+```
+
+## Requisitos
+
+- Node.js ≥ 20
+- pnpm ≥ 9 (`corepack enable` si no lo tienes)
+- Un proyecto de Firebase (Authentication con Google habilitado + Firestore)
+
+## Variables de entorno
+
+### `apps/backend/.env` (no versionado)
+
+```
+PORT=3001
+FRONTEND_ORIGIN=http://localhost:3000
+FIREBASE_PROJECT_ID=<tu-project-id>
+FIREBASE_SERVICE_ACCOUNT_BASE64=<base64 del JSON de la service account>
+```
+
+Para generar el base64 del service account (Project settings → Service accounts → Generate new
+private key):
+
+```bash
+base64 -w0 service-account.json
+```
+
+### `apps/frontend/.env.local` (no versionado)
+
+```
+NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_FB_API_KEY=<Web API key del proyecto>
+NEXT_PUBLIC_FB_AUTH_DOMAIN=<project-id>.firebaseapp.com
+NEXT_PUBLIC_FB_PROJECT_ID=<project-id>
+NEXT_PUBLIC_FB_APP_ID=<app id de la Web App>
+```
+
+Estos cuatro valores se obtienen registrando una Web App en Project settings → General → Your apps.
+
+## Puesta en marcha
+
+```bash
+pnpm install
+
+# 1. Publicar las reglas y los índices de Firestore (requiere `firebase login` una sola vez)
+npx firebase-tools login
+npx firebase-tools deploy --only firestore:rules,firestore:indexes
+
+# 2. Poblar datos de referencia (marcas, productos, proveedores, costos por medio)
+pnpm --filter backend seed
+
+# 3. Backend
+pnpm --filter backend dev        # http://localhost:3001
+
+# 4. Frontend (otra terminal)
+pnpm --filter frontend dev       # http://localhost:3000
+```
+
+### Asignar rol a un usuario
+
+El login es exclusivamente con Google; un usuario nuevo aparece en Firebase Auth recién después de
+su primer inicio de sesión. Para habilitarlo:
+
+```bash
+cd apps/backend
+pnpm set-claim <email> COMMERCIAL_ANALYST   # o APPROVER_MANAGER
+```
+
+El usuario debe cerrar sesión y volver a entrar para que el claim llegue al ID token.
+
+## Usuarios de prueba
+
+| Email | Rol |
+|---|---|
+| samueldeveloper20@gmail.com | COMMERCIAL_ANALYST |
+| samuelgraterol12@gmail.com | APPROVER_MANAGER |
+
+## Máquina de estados
+
+```
+DRAFT ──(enviar, analista dueño)──▶ PENDING_APPROVAL ──(aprobar, gerente)──▶ APPROVED (terminal)
+  ▲                                        │
+  └────(reenviar, analista dueño)──── REJECTED ◀──(rechazar + comentario, gerente)
+```
+
+Toda transición fuera de esta tabla es rechazada por el backend (`InvalidTransitionError`, HTTP 409).
+El rol y la propiedad de la campaña se validan en el dominio (`ForbiddenActionError`, HTTP 403),
+independientemente de lo que la interfaz permita mostrar.
+
+## Seguridad en tres capas
+
+1. **Frontend**: `middleware.ts` redirige por rol leyendo una cookie no-httpOnly — es una conveniencia
+   de UX, nunca la fuente de verdad.
+2. **Backend**: `FirebaseAuthGuard` verifica el ID Token con `firebase-admin`; `RolesGuard` +
+   `@Roles()` deniegan por rol; la máquina de estados del dominio vuelve a validar rol y propiedad
+   independientemente del guard.
+3. **Firestore**: `firestore.rules` con denegación por defecto — el cliente nunca escribe
+   `campaigns` directamente (solo el backend, vía Admin SDK), y solo puede leer lo que le
+   corresponde por rol.
+
+Verificado con pruebas automatizadas (40 tests en `apps/backend`, dominio y casos de uso) y
+manualmente contra el backend real: un token válido de `COMMERCIAL_ANALYST` invocando
+`POST /campaigns/:id/approve` o `POST /campaigns/:id/reject` directamente recibe `403 Forbidden`;
+un token de `APPROVER_MANAGER` invocando `POST /campaigns` para crear una campaña recibe el mismo
+`403`. En ningún caso la evaluación del rol depende de la interfaz.
+
+## Testing
+
+```bash
+cd apps/backend
+pnpm test
+```
+
+- `domain/`: máquina de estados y cálculo de costo — funciones puras, sin mocks.
+- `application/use-cases/`: cada caso de uso probado con un repositorio en memoria (fake), sin
+  Firestore ni NestJS.
+
+## Roadmap ejecutado (ventana de 48 horas)
+
+| Bloque | Foco | Estado |
+|---|---|---|
+| 1 · h0-12 | Monorepo, `packages/types`, auth guard + roles, conexión real a Firebase | ✅ |
+| 2 · h12-24 | Dominio + casos de uso + Firestore + `firestore.rules` + seed | ✅ |
+| 3 · h24-36 | Frontend completo: login, bandejas, formulario dinámico, detalle, aprobación | ✅ |
+| 4 · h36-48 | Pruebas de seguridad negativas, despliegue, README, video walkthrough | ✅ |
+
+## Deuda técnica asumida
+
+- **Tests de frontend**: no se escribieron (se priorizó el dominio y la seguridad del backend, que es
+  lo que puntúa explícitamente). La separación de capas MVVM sí se respetó de forma consistente para
+  que sean triviales de agregar después.
+- **Tests de integración con Firestore Emulator**: no se configuraron; el desarrollo y las pruebas
+  manuales se hicieron contra el proyecto real de Firebase, no contra un emulador local.
+- **`firestore.rules` / índices**: el despliegue automático vía Firebase CLI requiere login
+  interactivo (`firebase login`), así que quedó como paso manual documentado arriba en vez de
+  automatizarse en un script.
+- **Costeo de SMS y TikTok**: el catálogo `mediaCosts` almacena un costo plano por proveedor+canal
+  para estos dos medios (en vez de un costo por unidad de audiencia), separado del `dailyBudgetUsd`
+  de TikTok, que es el gasto publicitario propio de la cuenta. Es un supuesto razonable dado que el
+  enunciado no especifica la unidad de costeo para estos dos canales.
+- **Catálogo de tiendas y creativos**: se ingresan como texto libre separado por comas en el
+  formulario, ya no existe un catálogo de tiendas en el enunciado y no se justificaba crear uno para
+  el prototipo.
+- **Paginación**: cursor-based simple con un stack de cursores en memoria del cliente (se pierde al
+  recargar la página); es funcional pero no persiste el punto de navegación entre sesiones.
+- **Concurrencia en edición**: `PATCH /campaigns/:id` sobreescribe sin control de versión optimista
+  (last-write-wins). Para una campaña que solo su dueño puede editar y en estados no concurrentes
+  (DRAFT/REJECTED), el riesgo real es bajo, pero es una simplificación consciente.
+- **Diseño visual**: CSS mínimo inline, sin sistema de diseño ni responsive refinado — explícitamente
+  fuera de alcance según el enunciado ("no se busca... refinamiento visual").
