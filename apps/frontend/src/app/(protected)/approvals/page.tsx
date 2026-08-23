@@ -17,6 +17,7 @@ export default function ApprovalsQueuePage() {
       pagination={pagination}
       onApprove={actions.approve}
       onReject={actions.reject}
+      pendingCampaignId={actions.pendingCampaignId}
     />
   );
 }

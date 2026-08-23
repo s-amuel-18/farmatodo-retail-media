@@ -16,6 +16,7 @@ export default function CampaignsInboxPage() {
       onFiltersChange={setFilters}
       pagination={pagination}
       onSubmit={actions.submit}
+      pendingCampaignId={actions.pendingCampaignId}
     />
   );
 }

@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CampaignListFilters } from "@farmatodo-retail-media/types";
 import { campaignsService } from "../../services/campaigns.service";
 import type { FiltersBarValue } from "../shared/filters";
+import { useToast } from "../shared/toast-context";
 
 const EMPTY_FILTERS: FiltersBarValue = { status: [], dateFrom: "", dateTo: "" };
 
@@ -12,6 +13,7 @@ export function useCampaignsInbox() {
   const [filters, setFiltersState] = useState<FiltersBarValue>(EMPTY_FILTERS);
   const [cursorStack, setCursorStack] = useState<string[]>([]);
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   const apiFilters: CampaignListFilters = useMemo(
     () => ({
@@ -30,7 +32,10 @@ export function useCampaignsInbox() {
 
   const submit = useMutation({
     mutationFn: (campaignId: string) => campaignsService.submit(campaignId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["campaigns", "inbox"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["campaigns", "inbox"] });
+      showToast("Campaña enviada a aprobación.", "pending");
+    },
   });
 
   return {
@@ -54,6 +59,7 @@ export function useCampaignsInbox() {
     actions: {
       submit: (campaignId: string) => submit.mutate(campaignId),
       isSubmitting: submit.isPending,
+      pendingCampaignId: submit.isPending ? (submit.variables ?? null) : null,
     },
   };
 }

@@ -6,7 +6,7 @@ import { CampaignFormView } from "@/views/campaigns/CampaignFormView";
 
 export default function NewCampaignPage() {
   const { brands, products, suppliers, mediaCosts } = useReferenceData();
-  const { register, onSubmit, values, filteredProducts, estimatedCost, isSubmitting, error } =
+  const { register, onSubmit, values, filteredProducts, estimatedCost, isSubmitting, error, fieldErrors } =
     useCampaignForm({ target: { mode: "create" }, initialCampaign: null, products, mediaCosts });
 
   return (
@@ -21,6 +21,7 @@ export default function NewCampaignPage() {
       estimatedCost={estimatedCost}
       isSubmitting={isSubmitting}
       error={error}
+      fieldErrors={fieldErrors}
     />
   );
 }

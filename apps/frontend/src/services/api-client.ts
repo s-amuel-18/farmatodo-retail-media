@@ -26,7 +26,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({ message: response.statusText }));
-    throw new ApiError(response.status, body.message ?? "Request failed");
+    throw new ApiError(response.status, body.message ?? "No se pudo completar la solicitud.");
   }
 
   if (response.status === 204) return undefined as T;

@@ -6,6 +6,7 @@ import type { CampaignListFilters } from "@farmatodo-retail-media/types";
 import { approvalsService } from "../../services/approvals.service";
 import { campaignsService } from "../../services/campaigns.service";
 import type { FiltersBarValue } from "../shared/filters";
+import { useToast } from "../shared/toast-context";
 
 const DEFAULT_FILTERS: FiltersBarValue = { status: ["PENDING_APPROVAL"], dateFrom: "", dateTo: "" };
 
@@ -13,6 +14,7 @@ export function useApprovalsQueue() {
   const [filters, setFiltersState] = useState<FiltersBarValue>(DEFAULT_FILTERS);
   const [cursorStack, setCursorStack] = useState<string[]>([]);
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   const apiFilters: CampaignListFilters = useMemo(
     () => ({
@@ -35,13 +37,19 @@ export function useApprovalsQueue() {
 
   const approve = useMutation({
     mutationFn: (campaignId: string) => approvalsService.approve(campaignId),
-    onSuccess: invalidate,
+    onSuccess: () => {
+      invalidate();
+      showToast("Campaña aprobada.", "approved");
+    },
   });
 
   const reject = useMutation({
     mutationFn: (input: { campaignId: string; comment: string }) =>
       approvalsService.reject(input.campaignId, input.comment),
-    onSuccess: invalidate,
+    onSuccess: () => {
+      invalidate();
+      showToast("Campaña rechazada.", "rejected");
+    },
   });
 
   return {
@@ -65,6 +73,11 @@ export function useApprovalsQueue() {
     actions: {
       approve: (campaignId: string) => approve.mutate(campaignId),
       reject: (campaignId: string, comment: string) => reject.mutate({ campaignId, comment }),
+      pendingCampaignId: approve.isPending
+        ? (approve.variables ?? null)
+        : reject.isPending
+          ? (reject.variables?.campaignId ?? null)
+          : null,
     },
   };
 }
