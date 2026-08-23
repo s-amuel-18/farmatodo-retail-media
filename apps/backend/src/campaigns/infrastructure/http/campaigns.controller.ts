@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-  UsePipes,
-} from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from "@nestjs/common";
 import { newCampaignInputSchema, rejectCampaignSchema } from "@farmatodo-retail-media/types";
 import type {
   AuthenticatedUser,
@@ -44,17 +34,18 @@ export class CampaignsController {
 
   @Post()
   @Roles("COMMERCIAL_ANALYST")
-  @UsePipes(new ZodValidationPipe(newCampaignInputSchema))
-  create(@Body() body: NewCampaignInput, @CurrentUser() actor: AuthenticatedUser) {
+  create(
+    @Body(new ZodValidationPipe(newCampaignInputSchema)) body: NewCampaignInput,
+    @CurrentUser() actor: AuthenticatedUser,
+  ) {
     return this.createCampaign.execute({ data: body, actor });
   }
 
   @Patch(":id")
   @Roles("COMMERCIAL_ANALYST")
-  @UsePipes(new ZodValidationPipe(newCampaignInputSchema))
   update(
     @Param("id") id: string,
-    @Body() body: NewCampaignInput,
+    @Body(new ZodValidationPipe(newCampaignInputSchema)) body: NewCampaignInput,
     @CurrentUser() actor: AuthenticatedUser,
   ) {
     return this.updateCampaign.execute({ campaignId: id, data: body, actor });
@@ -87,10 +78,9 @@ export class CampaignsController {
 
   @Post(":id/reject")
   @Roles("APPROVER_MANAGER")
-  @UsePipes(new ZodValidationPipe(rejectCampaignSchema))
   reject(
     @Param("id") id: string,
-    @Body() body: { comment: string },
+    @Body(new ZodValidationPipe(rejectCampaignSchema)) body: { comment: string },
     @CurrentUser() actor: AuthenticatedUser,
   ) {
     return this.rejectCampaign.execute({ campaignId: id, comment: body.comment, actor });
