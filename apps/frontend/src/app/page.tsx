@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "../view-models/session/session-context";
+import { useSession } from "@/view-models/session/session-context";
 
 export default function RootPage() {
   const { user, isLoading } = useSession();

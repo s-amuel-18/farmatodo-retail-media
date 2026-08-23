@@ -1,19 +1,90 @@
-* {
-  box-sizing: border-box;
+@import "tailwindcss";
+
+/*
+ * Retail Media — Farmatodo design tokens.
+ * Navy/blue/gold extracted from the real farmatodo.com.ve (see DESIGN.md);
+ * status hues keep their semantic meaning but are retoned into this family.
+ */
+@theme {
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --color-navy-950: #0a1c40;
+  --color-navy-900: #0f2450;
+  --color-navy-800: #192e5a;
+  --color-navy-700: #24396e;
+  --color-navy-100: #e4e9f5;
+
+  --color-brand-blue-800: #26568c;
+  --color-brand-blue-700: #2f74bd;
+  --color-brand-blue-600: #418fde;
+  --color-brand-blue-50: #ecf3fb;
+
+  --color-gold-600: #b5860a;
+  --color-gold-500: #f0c419;
+  --color-gold-100: #fdf1cf;
+
+  --color-canvas: #f7f8fa;
+  --color-surface: #ffffff;
+  --color-ink: #16233f;
+  --color-text-muted: #57678a;
+  --color-border: #dbe2ee;
+
+  --color-danger-600: #c23a2b;
+  --color-danger-50: #fbe9e7;
+
+  --color-status-draft-bg: #e6e9f2;
+  --color-status-draft-fg: #3c4a68;
+  --color-status-pending-bg: #fdf1cf;
+  --color-status-pending-fg: #8a5a00;
+  --color-status-approved-bg: #dcf3e7;
+  --color-status-approved-fg: #0f6b42;
+  --color-status-rejected-bg: #fbe2df;
+  --color-status-rejected-fg: #b3271b;
+
+  --radius-control: 0.625rem;
+  --radius-pill: 999px;
+
+  --shadow-float: 0 10px 30px -10px rgb(15 36 80 / 0.35);
 }
 
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  color: #1a1a2e;
-  background: #f7f7fb;
-}
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
-}
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+  }
 
-a {
-  color: inherit;
+  ::selection {
+    background: var(--color-navy-100);
+    color: var(--color-navy-900);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-blue-600);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  * {
+    scrollbar-color: var(--color-navy-700) var(--color-canvas);
+    scrollbar-width: thin;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: var(--color-canvas);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: var(--color-navy-700);
+    border-radius: var(--radius-pill);
+    border: 2px solid var(--color-canvas);
+  }
 }

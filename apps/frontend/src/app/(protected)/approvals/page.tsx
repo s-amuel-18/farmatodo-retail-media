@@ -1,7 +1,7 @@
 "use client";
 
-import { useApprovalsQueue } from "../../../view-models/approvals/useApprovalsQueue";
-import { ApprovalsQueueView } from "../../../views/approvals/ApprovalsQueueView";
+import { useApprovalsQueue } from "@/view-models/approvals/useApprovalsQueue";
+import { ApprovalsQueueView } from "@/views/approvals/ApprovalsQueueView";
 
 export default function ApprovalsQueuePage() {
   const { campaigns, isLoading, error, filters, setFilters, pagination, actions } =

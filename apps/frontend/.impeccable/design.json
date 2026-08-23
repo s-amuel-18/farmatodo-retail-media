@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-23T19:30:26Z",
+  "title": "Design System: Retail Media — Farmatodo",
+  "extensions": {
+    "colorMeta": {
+      "navy-900": { "role": "neutral", "displayName": "Navy (hull)", "canonical": "#0f2450", "tonalRamp": ["#0c1d40", "#14306b", "#1c4496", "#2457c1", "#3e70db", "#6990e3", "#94b0eb", "#d4dff7"] },
+      "navy-800": { "role": "neutral", "displayName": "Navy — gradient partner", "canonical": "#192e5a", "tonalRamp": ["#111f3c", "#1c3364", "#27478c", "#325cb4", "#4b75cd", "#7394d8", "#9bb2e3", "#d7e0f4"] },
+      "brand-blue-700": { "role": "primary", "displayName": "Farmatodo Blue", "canonical": "#2f74bd", "tonalRamp": ["#0f263d", "#193f66", "#24588f", "#2e71b8", "#478ad1", "#70a4db", "#99bee6", "#d6e5f5"] },
+      "brand-blue-600": { "role": "primary", "displayName": "Farmatodo Blue — light touch", "canonical": "#418fde", "tonalRamp": ["#0b2641", "#133f6d", "#1a5998", "#2272c4", "#3b8cdd", "#67a5e5", "#92bfec", "#d4e5f7"] },
+      "gold-500": { "role": "secondary", "displayName": "Brass Gold", "canonical": "#f0c419", "tonalRamp": ["#483a05", "#786108", "#a8880b", "#d7ae0e", "#f1c828", "#f4d457", "#f7e087", "#fcf3cf"] },
+      "canvas": { "role": "neutral", "displayName": "Canvas", "canonical": "#f7f8fa", "tonalRamp": ["#1d232f", "#313b4e", "#45526e", "#586a8d", "#7283a7", "#919fba", "#b1bace", "#e0e4eb"] },
+      "surface": { "role": "neutral", "displayName": "Surface", "canonical": "#ffffff", "tonalRamp": ["#262626", "#404040", "#595959", "#737373", "#8c8c8c", "#a6a6a6", "#bfbfbf", "#e6e6e6"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#16233f", "tonalRamp": ["#142039", "#21355f", "#2e4a84", "#3b5faa", "#5578c4", "#7b96d1", "#a1b4de", "#d9e1f2"] },
+      "text-muted": { "role": "neutral", "displayName": "Muted Text", "canonical": "#57678a", "tonalRamp": ["#1e232f", "#313a4e", "#45526d", "#59698d", "#7283a6", "#929eba", "#b1bace", "#e0e3eb"] },
+      "border": { "role": "neutral", "displayName": "Border", "canonical": "#dbe2ee", "tonalRamp": ["#192334", "#293a57", "#395179", "#4a689c", "#6381b5", "#869dc6", "#a8b9d6", "#dce3ef"] },
+      "danger-600": { "role": "error", "displayName": "Danger", "canonical": "#c23a2b", "tonalRamp": ["#3f130e", "#681f17", "#922c20", "#bc382a", "#d55243", "#df786d", "#e89f97", "#f6d8d5"] },
+      "status-draft-bg": { "role": "neutral", "displayName": "Draft (bg)", "canonical": "#e6e9f2", "tonalRamp": ["#1a2032", "#2c3654", "#3d4b75", "#4f6197", "#687ab0", "#8a98c2", "#abb5d3", "#dde1ee"] },
+      "status-draft-fg": { "role": "neutral", "displayName": "Draft (fg)", "canonical": "#3c4a68", "tonalRamp": ["#1c2331", "#2f3a51", "#415171", "#546892", "#6d81ab", "#8e9dbe", "#aeb9d0", "#dfe3ec"] },
+      "status-pending-bg": { "role": "secondary", "displayName": "Pending / Brass Gold (bg)", "canonical": "#fdf1cf", "tonalRamp": ["#493703", "#7a5c05", "#ab8107", "#dca509", "#f6bf23", "#f8cd54", "#fadb85", "#fdf1ce"] },
+      "status-pending-fg": { "role": "secondary", "displayName": "Pending / Brass Gold (fg)", "canonical": "#8a5a00", "tonalRamp": ["#4d3200", "#805300", "#b37400", "#e69600", "#ffaf1a", "#ffc14d", "#ffd380", "#ffedcc"] },
+      "status-approved-bg": { "role": "success", "displayName": "Approved (bg)", "canonical": "#dcf3e7", "tonalRamp": ["#143925", "#215f3e", "#2e8557", "#3bab70", "#54c48a", "#7ad1a4", "#a0debe", "#d9f2e5"] },
+      "status-approved-fg": { "role": "success", "displayName": "Approved (fg)", "canonical": "#0f6b42", "tonalRamp": ["#094329", "#107045", "#169d61", "#1cc97c", "#36e396", "#62e9ad", "#8fefc4", "#d2f9e8"] },
+      "status-rejected-bg": { "role": "error", "displayName": "Rejected (bg)", "canonical": "#fbe2df", "tonalRamp": ["#440f08", "#71190e", "#9f2314", "#cc2d1a", "#e54633", "#eb6f60", "#f1988e", "#f9d6d2"] },
+      "status-rejected-fg": { "role": "error", "displayName": "Rejected (fg)", "canonical": "#b3271b", "tonalRamp": ["#420e0a", "#6f1811", "#9b2217", "#c72b1e", "#e14538", "#e86e64", "#ee9890", "#f8d6d3"] }
+    },
+    "typographyMeta": {
+      "title": { "displayName": "Title", "purpose": "Page headings only (\"Mis campañas\", campaign name)." },
+      "body": { "displayName": "Body", "purpose": "Default text: table cells, paragraphs, form values." },
+      "label": { "displayName": "Label", "purpose": "Form field labels." },
+      "caption": { "displayName": "Caption", "purpose": "Status badge text, field helper text, rejection-comment line." }
+    },
+    "shadows": [
+      { "name": "float", "value": "0 10px 30px -10px rgba(15, 36, 80, 0.35)", "purpose": "The system's one elevation level, reserved for the reject-campaign Modal." }
+    ],
+    "motion": [],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Guardar, Aprobar, + Nueva campaña — every primary action in the app.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">+ Nueva campaña</button>",
+      "css": ".ds-btn { border: none; border-radius: 10px; padding: 8px 16px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; font-weight: 500; transition: background-color 0.15s; } .ds-btn-primary { background: #2f74bd; color: #ffffff; } .ds-btn-primary:hover { background: #26568c; } .ds-btn-primary:focus-visible { outline: 2px solid #418fde; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Cancelar, Editar-adjacent actions, pagination.",
+      "html": "<button class=\"ds-btn ds-btn-secondary\">← Anterior</button>",
+      "css": ".ds-btn { border-radius: 10px; padding: 8px 16px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; font-weight: 500; transition: border-color 0.15s; } .ds-btn-secondary { background: #ffffff; color: #0f2450; border: 1px solid #dbe2ee; } .ds-btn-secondary:hover { border-color: #24396e; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Confirmar rechazo — the one destructive confirmation in the app.",
+      "html": "<button class=\"ds-btn ds-btn-danger\">Confirmar rechazo</button>",
+      "css": ".ds-btn { border: none; border-radius: 10px; padding: 8px 16px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; font-weight: 500; } .ds-btn-danger { background: #c23a2b; color: #ffffff; }"
+    },
+    {
+      "name": "Status Badge — Pending",
+      "kind": "chip",
+      "refersTo": "badge-pending",
+      "description": "Awaiting a manager's decision — the brass-gold status.",
+      "html": "<span class=\"ds-badge ds-badge-pending\">Pendiente</span>",
+      "css": ".ds-badge { border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 600; white-space: nowrap; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; } .ds-badge-pending { background: #fdf1cf; color: #8a5a00; }"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "refersTo": "control",
+      "description": "Shared recipe for every text/number/date/select/textarea control in the app.",
+      "html": "<input class=\"ds-input\" placeholder=\"Nombre\" />",
+      "css": ".ds-input { width: 100%; border-radius: 10px; border: 1px solid #dbe2ee; background: #ffffff; padding: 8px 12px; font-size: 14px; color: #16233f; } .ds-input::placeholder { color: #57678a; } .ds-input:focus-visible { border-color: #418fde; outline: none; }"
+    },
+    {
+      "name": "App Header",
+      "kind": "nav",
+      "refersTo": "header",
+      "description": "Navy header with the real Farmatodo wordmark; the only place Navy appears as a fill.",
+      "html": "<header class=\"ds-header\"><div class=\"ds-header-brand\">Retail Media</div><div class=\"ds-header-meta\">samueldeveloper20@gmail.com · Analista comercial</div></header>",
+      "css": ".ds-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; background: #0f2450; color: #ffffff; padding: 12px 24px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; } .ds-header-meta { color: #e4e9f5; font-size: 14px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Bridge",
+    "overview": "Navy hull, brass instruments, full visibility of everything underway — this system reads as the operating bridge of a real Farmatodo vessel, not a generic admin theme. The navy (#0f2450) is structural: it is where the product asserts this is Farmatodo's, not a decorative wash. Gold is brass, not confetti — it appears exactly where a human decision is waiting (the Pending status) and nowhere else. Everything in between — canvas, surfaces, borders, ink — stays quiet on purpose, because the two people who live in this tool all day are here to move campaigns through a state machine quickly, not to admire the room.\n\nThis is a real redesign, not a reskin: every color, radius, and component in this file was pulled from Farmatodo's own production site and then adapted for Operate — the promotional carousels and discount badges that make sense on a storefront were left behind on purpose; the navy, the brass gold, the pill-shaped controls, and the real Farmatodo wordmark came forward.",
+    "keyCharacteristics": [
+      "Navy header carries the real Farmatodo logo; everything below it lives on a quiet, near-white canvas.",
+      "Gold is reserved for exactly one meaning: Pending, a decision waiting on a human.",
+      "Soft, friendly control radius (10px) on every interactive control, tuned down from a full pill for table-dense screens.",
+      "One real shadow in the whole system, reserved for the modal that has to float above the table it interrupts."
+    ],
+    "rules": [
+      { "name": "The One Gold Rule", "body": "Brass gold means exactly one thing: a human decision is waiting. It never decorates a heading, a hover state, or an icon.", "section": "colors" },
+      { "name": "The No-Display Rule", "body": "No tier exists above Title (20px). This bridge never needs a hero moment.", "section": "typography" },
+      { "name": "The One Shadow Rule", "body": "Exactly one elevation level exists, and exactly one component (Modal) uses it.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep Navy exclusive to the header/hull — it is a structural color, not a text or accent color.",
+      "Do keep gold exclusive to \"a human decision is waiting\" (Pending status, the computed-cost callout).",
+      "Do use brand-blue-700, never brand-blue-600, wherever white text sits on a solid fill.",
+      "Do build every new form control from the shared controls.ts recipe rather than styling a bare input again."
+    ],
+    "donts": [
+      "Don't add a second gray for borders or muted text — every former inline-style gray has been consolidated into border and text-muted.",
+      "Don't give a button, card, or table a radius other than the control radius — the pill is spent entirely on the status badge.",
+      "Don't add a second shadow recipe.",
+      "Don't hardcode a campaign status, channel, or role label as a string literal in a view — add to campaign-vocabulary.ts instead."
+    ]
+  }
+}

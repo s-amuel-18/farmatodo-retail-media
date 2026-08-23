@@ -1,3 +1,6 @@
+import { BrandLogo } from "@/components/BrandLogo";
+import { Button, Card, ErrorText } from "@/components/ui";
+
 interface LoginViewProps {
   isLoading: boolean;
   pendingAccess: boolean;
@@ -8,35 +11,31 @@ interface LoginViewProps {
 
 export function LoginView({ isLoading, pendingAccess, error, onSignIn, onSignOut }: LoginViewProps) {
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <div style={{ textAlign: "center", maxWidth: 360 }}>
-        <h1 style={{ fontSize: 22, marginBottom: 8 }}>Retail Media</h1>
-        <p style={{ color: "#555", marginBottom: 24 }}>Farmatodo — gestión de campañas</p>
+    <main className="flex min-h-screen items-center justify-center bg-canvas px-4">
+      <Card className="w-full max-w-sm text-center shadow-float">
+        <BrandLogo className="mx-auto mb-6 h-8 w-auto" />
+        <h1 className="mb-1 text-xl font-semibold text-navy-900">Retail Media</h1>
+        <p className="mb-6 text-sm text-text-muted">Farmatodo — gestión de campañas</p>
 
         {pendingAccess ? (
           <div>
-            <p style={{ marginBottom: 16 }}>
+            <p className="mb-4 text-sm text-ink">
               Tu cuenta todavía no tiene un rol asignado. Contacta al administrador para que te
               habilite el acceso.
             </p>
-            <button onClick={onSignOut}>Cerrar sesión</button>
+            <Button variant="secondary" onClick={onSignOut} className="w-full">
+              Cerrar sesión
+            </Button>
           </div>
         ) : (
           <>
-            <button onClick={onSignIn} disabled={isLoading} style={{ padding: "10px 20px" }}>
+            <Button variant="primary" onClick={onSignIn} disabled={isLoading} className="w-full">
               {isLoading ? "Ingresando..." : "Ingresar con Google"}
-            </button>
-            {error ? <p style={{ color: "#c0392b", marginTop: 12 }}>{error}</p> : null}
+            </Button>
+            {error ? <ErrorText>{error}</ErrorText> : null}
           </>
         )}
-      </div>
+      </Card>
     </main>
   );
 }
