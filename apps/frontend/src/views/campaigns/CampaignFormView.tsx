@@ -4,7 +4,7 @@ import type { BaseSyntheticEvent } from "react";
 import type { UseFormRegister } from "react-hook-form";
 import type { Brand, Product, Supplier } from "@farmatodo-retail-media/types";
 import type { CampaignFormValues } from "../../view-models/campaigns/useCampaignForm";
-import { Button, ErrorText, Field, Input, Select, Textarea } from "@/components/ui";
+import { Button, ErrorText, Field, Input, MultiCombobox, Select, Textarea } from "@/components/ui";
 import { CHANNEL_LABELS, CHANNEL_TYPES, PETALO_ZONES, PETALO_ZONE_LABELS } from "@/lib/campaign-vocabulary";
 
 interface CampaignFormViewProps {
@@ -14,6 +14,8 @@ interface CampaignFormViewProps {
   onSubmit: (event?: BaseSyntheticEvent) => void;
   brands: Brand[];
   filteredProducts: Product[];
+  onBrandsChange: (next: string[]) => void;
+  onProductsChange: (next: string[]) => void;
   suppliers: Supplier[];
   estimatedCost: number | null;
   isSubmitting: boolean;
@@ -27,6 +29,8 @@ export function CampaignFormView({
   onSubmit,
   brands,
   filteredProducts,
+  onBrandsChange,
+  onProductsChange,
   suppliers,
   estimatedCost,
   isSubmitting,
@@ -45,23 +49,23 @@ export function CampaignFormView({
       </Field>
 
       <Field label="Marca(s)">
-        <Select multiple {...register("brandIds")} className="h-20">
-          {brands.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.name}
-            </option>
-          ))}
-        </Select>
+        <MultiCombobox
+          options={brands.map((b) => ({ value: b.id, label: b.name }))}
+          value={values.brandIds ?? []}
+          onChange={onBrandsChange}
+          placeholder="Buscar marca..."
+        />
       </Field>
 
       <Field label="Producto(s) (SKU)">
-        <Select multiple {...register("productSkus")} className="h-20">
-          {filteredProducts.map((p) => (
-            <option key={p.sku} value={p.sku}>
-              {p.name}
-            </option>
-          ))}
-        </Select>
+        <MultiCombobox
+          options={filteredProducts.map((p) => ({ value: p.sku, label: p.name }))}
+          value={values.productSkus ?? []}
+          onChange={onProductsChange}
+          placeholder="Buscar producto..."
+          disabled={(values.brandIds?.length ?? 0) === 0}
+          emptyMessage="Selecciona una marca primero"
+        />
       </Field>
 
       <Field label="Proveedor">

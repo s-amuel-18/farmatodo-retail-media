@@ -11,13 +11,22 @@ export default function EditCampaignPage() {
   const { id } = useParams<{ id: string }>();
   const { campaign, isLoading } = useCampaign(id);
   const { brands, products, suppliers, mediaCosts } = useReferenceData();
-  const { register, onSubmit, values, filteredProducts, estimatedCost, isSubmitting, error } =
-    useCampaignForm({
-      target: { mode: "edit", campaignId: id },
-      initialCampaign: campaign,
-      products,
-      mediaCosts,
-    });
+  const {
+    register,
+    onSubmit,
+    values,
+    filteredProducts,
+    onBrandsChange,
+    onProductsChange,
+    estimatedCost,
+    isSubmitting,
+    error,
+  } = useCampaignForm({
+    target: { mode: "edit", campaignId: id },
+    initialCampaign: campaign,
+    products,
+    mediaCosts,
+  });
 
   if (isLoading) return <LoadingState />;
   if (!campaign) return <p className="text-sm text-text-muted">No se encontró la campaña.</p>;
@@ -30,6 +39,8 @@ export default function EditCampaignPage() {
       onSubmit={onSubmit}
       brands={brands}
       filteredProducts={filteredProducts}
+      onBrandsChange={onBrandsChange}
+      onProductsChange={onProductsChange}
       suppliers={suppliers}
       estimatedCost={estimatedCost}
       isSubmitting={isSubmitting}

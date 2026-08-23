@@ -6,6 +6,7 @@ import type { Campaign, HistoryEntry } from "@farmatodo-retail-media/types";
 import { StatusBadge } from "../shared/StatusBadge";
 import { Button, ErrorText, LoadingState, Textarea } from "@/components/ui";
 import { CHANNEL_LABELS, HISTORY_ACTION_LABELS, PETALO_ZONE_LABELS } from "@/lib/campaign-vocabulary";
+import { useReferenceData } from "@/view-models/campaigns/useReferenceData";
 
 function channelDetails(campaign: Campaign): Array<[string, string]> {
   switch (campaign.channel) {
@@ -59,9 +60,15 @@ export function CampaignDetailView({
 }: CampaignDetailViewProps) {
   const [rejectComment, setRejectComment] = useState("");
   const [isRejecting, setIsRejecting] = useState(false);
+  const { brands, suppliers } = useReferenceData();
 
   if (isLoading) return <LoadingState />;
   if (error) return <ErrorText>{error}</ErrorText>;
+
+  const supplierName = suppliers.find((s) => s.id === campaign.supplierId)?.name ?? campaign.supplierId;
+  const brandNames = campaign.brandIds
+    .map((id) => brands.find((b) => b.id === id)?.name ?? id)
+    .join(", ");
 
   return (
     <div className="max-w-2xl">
@@ -76,8 +83,8 @@ export function CampaignDetailView({
 
       <Section title="Datos generales">
         <Row label="Canal" value={CHANNEL_LABELS[campaign.channel]} />
-        <Row label="Proveedor" value={campaign.supplierId} />
-        <Row label="Marcas" value={campaign.brandIds.join(", ")} />
+        <Row label="Proveedor" value={supplierName} />
+        <Row label="Marcas" value={brandNames} />
         <Row label="Productos (SKU)" value={campaign.productSkus.join(", ")} />
         <Row label="Fecha inicio" value={campaign.startDate} />
         <Row label="Fecha fin" value={campaign.endDate} />

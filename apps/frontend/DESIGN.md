@@ -154,7 +154,7 @@ Flat everywhere except one place: the reject-campaign modal, which needs to visi
 
 ## Shapes
 
-Soft control radius (`{rounded.control}` 10px) on every button, input, select, textarea, and card — enough to read as the same friendly, rounded language as Farmatodo's own pill-shaped public buttons, tuned down from a literal pill so a dense table of campaigns doesn't turn into a row of gumdrops. The pill (`{rounded.pill}` 999px) stays reserved for the one place a full pill still earns its keep: the status badge, where "distinct from everything else on the row" is the entire point.
+Soft control radius (`{rounded.control}` 10px) on every button, input, select, textarea, and card — enough to read as the same friendly, rounded language as Farmatodo's own pill-shaped public buttons, tuned down from a literal pill so a dense table of campaigns doesn't turn into a row of gumdrops. The pill (`{rounded.pill}` 999px) stays reserved for status-shaped and selection-shaped tokens — the status badge, its interactive Toggle Chip counterpart, and a MultiCombobox's selected-item chips — where "distinct from the surrounding row or field" is the entire point.
 
 ## Components
 
@@ -168,7 +168,15 @@ Soft control radius (`{rounded.control}` 10px) on every button, input, select, t
 
 ### Status Badge
 - **Shape:** pill, `padding: 2px 10px`, Caption type.
-- One of the four status pairs, chosen by campaign status — the only component in the system still allowed the full pill radius.
+- One of the four status pairs, chosen by campaign status — a static label, never itself clickable.
+
+### Toggle Chip
+- **Shape:** pill, same tone pairs as Status Badge, plus a `neutral` (Navy-100) tone for non-status toggles.
+- The interactive counterpart to Status Badge: a pressable pill (`role="checkbox"`, `aria-checked`) used for multi-select filters, e.g. the campaign-status filter in the inbox and approvals queue. Unpressed state is an outlined `border`/`text-muted` pill; pressed state switches to the matching Status Badge tone, with a small checkmark that fades in/out without reflowing the pill's width. Always grouped in a `<fieldset>`/`<legend>` when used as a filter, so the group has an accessible name.
+
+### MultiCombobox
+- **Shape:** the shared control recipe (`components/ui/controls.ts`) as the container; selected items render as Navy-100 chips with a remove button inside it; the option list is a bordered, `{rounded.control}` panel below — **no shadow** (see the One Shadow Rule above; this is the one place the system deliberately leaves a floating panel unshadowed rather than adding a second elevation level).
+- Replaces a native `<select multiple>` wherever the catalog is real (brands, products) rather than a short fixed enum: type-to-filter, chips for the current picks, keyboard support (arrows, Enter, Escape, Backspace-to-remove-last), and a selection that survives a stray click instead of collapsing to one item. Pass `disabled` + `emptyMessage` for a field that's gated on another field's selection (e.g. Producto is gated on Marca) rather than silently rendering an empty list.
 
 ### Card
 - White surface, `{rounded.control}`, `Border`-colored 1px outline, `p-6`. Used for the login panel; the table container reuses the same recipe directly rather than a second card variant.
@@ -189,6 +197,7 @@ Soft control radius (`{rounded.control}` 10px) on every button, input, select, t
 - **Do** keep gold exclusive to "a human decision is waiting" (Pending status, the computed-cost callout).
 - **Do** use `brand-blue-700`, never `brand-blue-600`, wherever white text sits on a solid fill — `600` is for lighter touches (focus rings, larger brand moments) where AA text contrast doesn't apply.
 - **Do** build every new form control from `components/ui/controls.ts`'s shared recipe rather than styling a bare `<input>`/`<select>`/`<textarea>` again.
+- **Do** reach for `ToggleChip` over a raw checkbox for any multi-select filter, and `MultiCombobox` over a native `<select multiple>` whenever the option list is a real, growable catalog (brands, products) rather than a short fixed enum.
 
 ### Don't:
 - **Don't** add a second gray for borders or muted text. Every former inline-style gray (`#e5e7eb`/`#f0f0f0`/`#ddd`, `#666`/`#555`/`#444`) has been consolidated into the single `border` and `text-muted` tokens — reintroducing a one-off gray undoes that.
