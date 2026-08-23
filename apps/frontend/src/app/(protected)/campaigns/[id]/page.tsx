@@ -13,5 +13,13 @@ export default function CampaignDetailPage() {
   if (error) return <ErrorText>{error}</ErrorText>;
   if (!campaign) return <p className="text-sm text-text-muted">No se encontró la campaña.</p>;
 
-  return <CampaignDetailView campaign={campaign} history={history} isLoading={false} error={null} />;
+  return (
+    <CampaignDetailView
+      campaign={campaign}
+      history={history}
+      isLoading={false}
+      error={null}
+      backHref="/campaigns"
+    />
+  );
 }

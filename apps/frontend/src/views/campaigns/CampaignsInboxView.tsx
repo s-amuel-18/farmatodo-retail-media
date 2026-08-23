@@ -82,7 +82,10 @@ export function CampaignsInboxView({
                 <Td>
                   {EDITABLE_CAMPAIGN_STATUSES.has(campaign.status) ? (
                     <div className="flex gap-3">
-                      <Link href={`/campaigns/${campaign.id}/edit`} className="text-sm text-brand-blue-700 hover:underline">
+                      <Link
+                        href={`/campaigns/${campaign.id}/edit`}
+                        className="text-sm font-medium text-brand-blue-700 hover:underline"
+                      >
                         Editar
                       </Link>
                       <Button

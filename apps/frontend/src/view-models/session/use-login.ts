@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "./session-context";
+import { ROLE_HOME_ROUTE } from "@/lib/campaign-vocabulary";
 
 export function useLogin() {
   const { user, isLoading, actions } = useSession();
@@ -11,9 +12,8 @@ export function useLogin() {
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   useEffect(() => {
-    if (isLoading || !user) return;
-    if (user.role === "COMMERCIAL_ANALYST") router.replace("/campaigns");
-    if (user.role === "APPROVER_MANAGER") router.replace("/approvals");
+    if (isLoading || !user?.role) return;
+    router.replace(ROLE_HOME_ROUTE[user.role]);
   }, [user, isLoading, router]);
 
   return {

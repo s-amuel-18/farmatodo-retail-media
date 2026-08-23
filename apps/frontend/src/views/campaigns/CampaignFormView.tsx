@@ -2,6 +2,7 @@
 
 import type { BaseSyntheticEvent } from "react";
 import type { UseFormRegister } from "react-hook-form";
+import Link from "next/link";
 import type { Brand, Product, Supplier } from "@farmatodo-retail-media/types";
 import type { CampaignFormValues } from "../../view-models/campaigns/useCampaignForm";
 import { Button, ErrorText, Field, Input, Select, Textarea } from "@/components/ui";
@@ -18,6 +19,7 @@ interface CampaignFormViewProps {
   estimatedCost: number | null;
   isSubmitting: boolean;
   error: string | null;
+  backHref: string;
 }
 
 export function CampaignFormView({
@@ -31,11 +33,15 @@ export function CampaignFormView({
   estimatedCost,
   isSubmitting,
   error,
+  backHref,
 }: CampaignFormViewProps) {
   const channel = values.channel;
 
   return (
     <form onSubmit={onSubmit} className="max-w-2xl">
+      <Link href={backHref} className="mb-3 inline-block text-sm text-brand-blue-700 hover:underline">
+        ← Volver
+      </Link>
       <h1 className="mb-4 text-xl font-semibold text-navy-900">
         {mode === "create" ? "Nueva campaña" : "Editar campaña"}
       </h1>
@@ -179,9 +185,16 @@ export function CampaignFormView({
 
       {error ? <ErrorText>{error}</ErrorText> : null}
 
-      <Button type="submit" variant="primary" disabled={isSubmitting}>
-        {isSubmitting ? "Guardando..." : "Guardar"}
-      </Button>
+      <div className="flex gap-3">
+        <Button type="submit" variant="primary" disabled={isSubmitting}>
+          {isSubmitting ? "Guardando..." : "Guardar"}
+        </Button>
+        <Link href={backHref}>
+          <Button type="button" variant="ghost" disabled={isSubmitting}>
+            Cancelar
+          </Button>
+        </Link>
+      </div>
     </form>
   );
 }

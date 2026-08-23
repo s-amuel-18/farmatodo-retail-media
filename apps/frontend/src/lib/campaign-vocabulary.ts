@@ -43,6 +43,11 @@ export const ROLE_LABELS: Record<Role, string> = {
   APPROVER_MANAGER: "Gerente de aprobación",
 };
 
+export const ROLE_HOME_ROUTE: Record<Role, string> = {
+  COMMERCIAL_ANALYST: "/campaigns",
+  APPROVER_MANAGER: "/approvals",
+};
+
 export const HISTORY_ACTION_LABELS: Record<HistoryEntry["action"], string> = {
   SUBMITTED: "Enviada a aprobación",
   APPROVED: "Aprobada",
