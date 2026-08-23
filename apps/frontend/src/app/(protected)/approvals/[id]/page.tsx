@@ -21,6 +21,7 @@ export default function ApprovalDetailPage() {
       history={history}
       isLoading={false}
       error={null}
+      backHref="/approvals"
       approverActions={{ onApprove, onReject }}
     />
   );

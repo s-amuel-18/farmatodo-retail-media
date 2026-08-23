@@ -21,6 +21,7 @@ export default function NewCampaignPage() {
       estimatedCost={estimatedCost}
       isSubmitting={isSubmitting}
       error={error}
+      backHref="/campaigns"
     />
   );
 }

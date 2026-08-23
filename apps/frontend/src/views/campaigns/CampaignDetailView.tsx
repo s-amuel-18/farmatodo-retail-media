@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { ReactNode } from "react";
+import Link from "next/link";
 import type { Campaign, HistoryEntry } from "@farmatodo-retail-media/types";
 import { StatusBadge } from "../shared/StatusBadge";
 import { Button, ErrorText, LoadingState, Textarea } from "@/components/ui";
@@ -44,6 +45,7 @@ interface CampaignDetailViewProps {
   history: HistoryEntry[];
   isLoading: boolean;
   error: string | null;
+  backHref: string;
   approverActions?: {
     onApprove: () => void;
     onReject: (comment: string) => void;
@@ -55,6 +57,7 @@ export function CampaignDetailView({
   history,
   isLoading,
   error,
+  backHref,
   approverActions,
 }: CampaignDetailViewProps) {
   const [rejectComment, setRejectComment] = useState("");
@@ -65,6 +68,9 @@ export function CampaignDetailView({
 
   return (
     <div className="max-w-2xl">
+      <Link href={backHref} className="mb-3 inline-block text-sm text-brand-blue-700 hover:underline">
+        ← Volver
+      </Link>
       <div className="mb-4 flex items-center gap-3">
         <h1 className="text-xl font-semibold text-navy-900">{campaign.name}</h1>
         <StatusBadge status={campaign.status} />

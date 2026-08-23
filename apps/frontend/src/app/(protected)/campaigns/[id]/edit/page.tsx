@@ -34,6 +34,7 @@ export default function EditCampaignPage() {
       estimatedCost={estimatedCost}
       isSubmitting={isSubmitting}
       error={error}
+      backHref="/campaigns"
     />
   );
 }

@@ -10,7 +10,7 @@ import { ROLE_HOME_ROUTE } from "./lib/role-routes";
  */
 export function middleware(request: NextRequest) {
   const hasSession = request.cookies.get("session")?.value === "1";
-  const role = request.cookies.get("role")?.value;
+  const role = request.cookies.get("role")?.value as keyof typeof ROLE_HOME_ROUTE | undefined;
   const { pathname } = request.nextUrl;
 
   if (!hasSession) {
