@@ -1,3 +1,7 @@
+import {
+  CAMPAIGN_STATUSES,
+  EDITABLE_CAMPAIGN_STATUSES as EDITABLE_CAMPAIGN_STATUSES_LIST,
+} from "@farmatodo-retail-media/types";
 import type { CampaignStatus, ChannelType, HistoryEntry, PetaloZone, Role } from "@farmatodo-retail-media/types";
 
 /**
@@ -5,12 +9,7 @@ import type { CampaignStatus, ChannelType, HistoryEntry, PetaloZone, Role } from
  * Nothing here should be re-declared inline in a view; add a new entry here instead.
  */
 
-export const CAMPAIGN_STATUSES: readonly CampaignStatus[] = [
-  "DRAFT",
-  "PENDING_APPROVAL",
-  "APPROVED",
-  "REJECTED",
-];
+export { CAMPAIGN_STATUSES };
 
 export const CAMPAIGN_STATUS_LABELS: Record<CampaignStatus, string> = {
   DRAFT: "Borrador",
@@ -19,7 +18,9 @@ export const CAMPAIGN_STATUS_LABELS: Record<CampaignStatus, string> = {
   REJECTED: "Rechazada",
 };
 
-export const EDITABLE_CAMPAIGN_STATUSES: ReadonlySet<CampaignStatus> = new Set(["DRAFT", "REJECTED"]);
+export const EDITABLE_CAMPAIGN_STATUSES: ReadonlySet<CampaignStatus> = new Set(
+  EDITABLE_CAMPAIGN_STATUSES_LIST,
+);
 
 export const CHANNEL_TYPES: readonly ChannelType[] = ["PETALO", "PARRILLERA", "SMS", "TIKTOK"];
 

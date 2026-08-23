@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { ROLE_HOME_ROUTE } from "@/lib/role-routes";
 import { useSession } from "@/view-models/session/session-context";
 
 export default function RootPage() {
@@ -12,10 +13,8 @@ export default function RootPage() {
     if (isLoading) return;
     if (!user) {
       router.replace("/login");
-    } else if (user.role === "COMMERCIAL_ANALYST") {
-      router.replace("/campaigns");
-    } else if (user.role === "APPROVER_MANAGER") {
-      router.replace("/approvals");
+    } else if (user.role) {
+      router.replace(ROLE_HOME_ROUTE[user.role]);
     }
   }, [user, isLoading, router]);
 
