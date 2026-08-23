@@ -24,20 +24,22 @@ const SIZE_CLASSES: Record<ButtonSize, string> = {
   md: "px-4 py-2 text-sm",
 };
 
+/**
+ * Shared with any link that must look like a button (e.g. Next.js `<Link>`)
+ * so styling stays on one recipe without nesting a <button> inside an <a>.
+ */
+export function buttonClassName(variant: ButtonVariant = "secondary", size: ButtonSize = "md", className?: string) {
+  return clsx(
+    "inline-flex items-center justify-center gap-2 rounded-control font-medium transition-colors disabled:cursor-not-allowed",
+    VARIANT_CLASSES[variant],
+    SIZE_CLASSES[size],
+    className,
+  );
+}
+
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   { variant = "secondary", size = "md", className, ...props },
   ref,
 ) {
-  return (
-    <button
-      ref={ref}
-      className={clsx(
-        "inline-flex items-center justify-center gap-2 rounded-control font-medium transition-colors disabled:cursor-not-allowed",
-        VARIANT_CLASSES[variant],
-        SIZE_CLASSES[size],
-        className,
-      )}
-      {...props}
-    />
-  );
+  return <button ref={ref} className={buttonClassName(variant, size, className)} {...props} />;
 });

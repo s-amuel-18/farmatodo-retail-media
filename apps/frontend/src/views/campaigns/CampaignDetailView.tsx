@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import type { Campaign, HistoryEntry } from "@farmatodo-retail-media/types";
 import { StatusBadge } from "../shared/StatusBadge";
-import { Button, ErrorText, LoadingState, Textarea } from "@/components/ui";
+import { Button, ErrorText, Field, LoadingState, Textarea } from "@/components/ui";
 import { CHANNEL_LABELS, HISTORY_ACTION_LABELS, PETALO_ZONE_LABELS } from "@/lib/campaign-vocabulary";
 
 function channelDetails(campaign: Campaign): Array<[string, string]> {
@@ -45,9 +45,11 @@ interface CampaignDetailViewProps {
   isLoading: boolean;
   error: string | null;
   approverActions?: {
-    onApprove: () => void;
-    onReject: (comment: string) => void;
+    onApprove: () => Promise<unknown>;
+    onReject: (comment: string) => Promise<unknown>;
   };
+  decisionError?: string | null;
+  statusMessage?: string | null;
 }
 
 export function CampaignDetailView({
@@ -56,23 +58,33 @@ export function CampaignDetailView({
   isLoading,
   error,
   approverActions,
+  decisionError,
+  statusMessage,
 }: CampaignDetailViewProps) {
   const [rejectComment, setRejectComment] = useState("");
   const [isRejecting, setIsRejecting] = useState(false);
+  const [rejectError, setRejectError] = useState<string | null>(null);
 
   if (isLoading) return <LoadingState />;
   if (error) return <ErrorText>{error}</ErrorText>;
 
   return (
     <div className="max-w-2xl">
+      <p role="status" aria-live="polite" className="sr-only">
+        {statusMessage}
+      </p>
+
       <div className="mb-4 flex items-center gap-3">
         <h1 className="text-xl font-semibold text-navy-900">{campaign.name}</h1>
         <StatusBadge status={campaign.status} />
       </div>
 
       {campaign.status === "REJECTED" && campaign.currentApprovalComment ? (
-        <ErrorText>Motivo del rechazo: {campaign.currentApprovalComment}</ErrorText>
+        <p className="mb-3 text-sm text-danger-600">
+          Motivo del rechazo: {campaign.currentApprovalComment}
+        </p>
       ) : null}
+      {decisionError ? <ErrorText>{decisionError}</ErrorText> : null}
 
       <Section title="Datos generales">
         <Row label="Canal" value={CHANNEL_LABELS[campaign.channel]} />
@@ -110,28 +122,48 @@ export function CampaignDetailView({
       {approverActions && campaign.status === "PENDING_APPROVAL" ? (
         <Section title="Decisión">
           <div className="mb-2 flex gap-2">
-            <Button variant="primary" onClick={approverActions.onApprove}>
+            <Button
+              variant="primary"
+              onClick={() => {
+                approverActions.onApprove().catch(() => {});
+              }}
+            >
               Aprobar
             </Button>
-            <Button variant="secondary" onClick={() => setIsRejecting(true)}>
+            <Button
+              variant="secondary"
+              aria-expanded={isRejecting}
+              aria-controls="reject-comment-panel"
+              onClick={() => {
+                setRejectError(null);
+                setIsRejecting(true);
+              }}
+            >
               Rechazar
             </Button>
           </div>
           {isRejecting ? (
-            <div>
-              <Textarea
-                value={rejectComment}
-                onChange={(e) => setRejectComment(e.target.value)}
-                rows={3}
-                className="mb-2"
-                placeholder="Comentario obligatorio para el analista"
-              />
+            <div id="reject-comment-panel">
+              <Field label="Comentario de rechazo" required>
+                <Textarea
+                  value={rejectComment}
+                  onChange={(e) => setRejectComment(e.target.value)}
+                  rows={3}
+                  className="mb-2"
+                  placeholder="Comentario obligatorio para el analista"
+                />
+              </Field>
+              {rejectError ? <ErrorText>{rejectError}</ErrorText> : null}
               <Button
                 variant="danger"
                 disabled={!rejectComment.trim()}
                 onClick={() => {
-                  approverActions.onReject(rejectComment.trim());
-                  setIsRejecting(false);
+                  approverActions
+                    .onReject(rejectComment.trim())
+                    .then(() => setIsRejecting(false))
+                    .catch((err) =>
+                      setRejectError(err instanceof Error ? err.message : "No se pudo rechazar la campaña."),
+                    );
                 }}
               >
                 Confirmar rechazo

@@ -13,7 +13,12 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
       {user?.role ? (
         <AppHeader email={user.email} roleLabel={ROLE_LABELS[user.role]} onSignOut={actions.signOut} />
       ) : null}
-      <div className="p-6">{children}</div>
+      {/* tabIndex + outline-none: skip-link landing target, not a normal focusable
+          control — a visible ring around the whole content region reads as broken,
+          and reaching it already comes with an obvious visual context change. */}
+      <main id="main-content" tabIndex={-1} className="p-6 outline-none">
+        {children}
+      </main>
     </div>
   );
 }

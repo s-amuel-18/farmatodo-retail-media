@@ -4,7 +4,19 @@ import { StatusBadge } from "../shared/StatusBadge";
 import { FiltersBar } from "../shared/FiltersBar";
 import type { FiltersBarValue } from "../../view-models/shared/filters";
 import { Pagination } from "../shared/Pagination";
-import { Button, EmptyState, ErrorText, LoadingState, Table, TableBody, TableHead, TableRow, Td, Th } from "@/components/ui";
+import {
+  Button,
+  buttonClassName,
+  EmptyState,
+  ErrorText,
+  LoadingState,
+  Table,
+  TableBody,
+  TableHead,
+  TableRow,
+  Td,
+  Th,
+} from "@/components/ui";
 import { CHANNEL_LABELS, EDITABLE_CAMPAIGN_STATUSES } from "@/lib/campaign-vocabulary";
 
 interface CampaignsInboxViewProps {
@@ -19,7 +31,9 @@ interface CampaignsInboxViewProps {
     onNext: () => void;
     onPrev: () => void;
   };
-  onSubmit: (campaignId: string) => void;
+  onSubmit: (campaignId: string) => Promise<unknown>;
+  submitError?: string | null;
+  statusMessage?: string | null;
 }
 
 export function CampaignsInboxView({
@@ -30,19 +44,26 @@ export function CampaignsInboxView({
   onFiltersChange,
   pagination,
   onSubmit,
+  submitError,
+  statusMessage,
 }: CampaignsInboxViewProps) {
   return (
     <div>
+      <p role="status" aria-live="polite" className="sr-only">
+        {statusMessage}
+      </p>
+
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-xl font-semibold text-navy-900">Mis campañas</h1>
-        <Link href="/campaigns/new">
-          <Button variant="primary">+ Nueva campaña</Button>
+        <Link href="/campaigns/new" className={buttonClassName("primary")}>
+          <span aria-hidden="true">+</span> Nueva campaña
         </Link>
       </div>
 
       <FiltersBar value={filters} onChange={onFiltersChange} />
 
       {error ? <ErrorText>{error}</ErrorText> : null}
+      {submitError ? <ErrorText>{submitError}</ErrorText> : null}
       {isLoading ? <LoadingState /> : null}
 
       {!isLoading && campaigns.length === 0 ? (
@@ -51,14 +72,16 @@ export function CampaignsInboxView({
 
       {campaigns.length > 0 ? (
         <div className="overflow-x-auto rounded-control border border-border bg-surface">
-        <Table>
+        <Table caption="Mis campañas y su estado">
           <TableHead>
             <tr>
               <Th>Nombre</Th>
               <Th>Canal</Th>
               <Th>Costo total</Th>
               <Th>Estado</Th>
-              <Th />
+              <Th>
+                <span className="sr-only">Acciones</span>
+              </Th>
             </tr>
           </TableHead>
           <TableBody>
@@ -88,7 +111,9 @@ export function CampaignsInboxView({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => onSubmit(campaign.id)}
+                        onClick={() => {
+                          onSubmit(campaign.id).catch(() => {});
+                        }}
                         className="h-auto p-0 font-medium text-brand-blue-700 hover:bg-transparent hover:underline"
                       >
                         Enviar a aprobación

@@ -9,7 +9,7 @@ import { ErrorText, LoadingState } from "@/components/ui";
 export default function ApprovalDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { campaign, history, isLoading, error } = useCampaign(id);
-  const { onApprove, onReject } = useApprovalDecision(id);
+  const { onApprove, onReject, decisionError, statusMessage } = useApprovalDecision(id);
 
   if (isLoading) return <LoadingState />;
   if (error) return <ErrorText>{error}</ErrorText>;
@@ -22,6 +22,8 @@ export default function ApprovalDetailPage() {
       isLoading={false}
       error={null}
       approverActions={{ onApprove, onReject }}
+      decisionError={decisionError}
+      statusMessage={statusMessage}
     />
   );
 }

@@ -11,7 +11,11 @@ interface LoginViewProps {
 
 export function LoginView({ isLoading, pendingAccess, error, onSignIn, onSignOut }: LoginViewProps) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-canvas px-4">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="flex min-h-screen items-center justify-center bg-canvas px-4 outline-none"
+    >
       <Card className="w-full max-w-sm text-center shadow-float">
         <BrandLogo className="mx-auto mb-6 h-8 w-auto" />
         <h1 className="mb-1 text-xl font-semibold text-navy-900">Retail Media</h1>

@@ -193,7 +193,13 @@ export function useCampaignForm({ target, initialCampaign, products, mediaCosts 
   const queryClient = useQueryClient();
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  const { register, handleSubmit, watch, reset } = useForm<CampaignFormValues>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<CampaignFormValues>({
     defaultValues: toDefaultValues(initialCampaign),
   });
 
@@ -226,9 +232,14 @@ export function useCampaignForm({ target, initialCampaign, products, mediaCosts 
     mutation.mutate(result.data);
   }
 
+  function onInvalid(): void {
+    setValidationError("Revisa los campos marcados con * antes de guardar.");
+  }
+
   return {
     register,
-    onSubmit: handleSubmit(onValid),
+    errors,
+    onSubmit: handleSubmit(onValid, onInvalid),
     values,
     filteredProducts,
     estimatedCost,
