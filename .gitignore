@@ -1,0 +1,21 @@
+node_modules/
+dist/
+.next/
+out/
+coverage/
+*.log
+
+# env / secrets
+.env
+.env.*
+!.env.example
+*.serviceAccountKey.json
+firebase-service-account*.json
+
+# editor / os
+.DS_Store
+.vscode/
+.idea/
+
+# turbo (if enabled later)
+.turbo/

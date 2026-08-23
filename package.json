@@ -1,0 +1,18 @@
+{
+  "name": "farmatodo-retail-media",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev:backend": "pnpm --filter backend dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "seed": "pnpm --filter backend seed",
+    "set-claim": "pnpm --filter backend set-claim"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@11.4.0"
+}
