@@ -1,7 +1,11 @@
 import type { Role } from "./user";
 
-export type ApprovalDecision = "APPROVED" | "REJECTED";
-
+/**
+ * One append-only record per state transition (submit/approve/reject), stored
+ * in each campaign's `history` subcollection. This is the sole traceability
+ * model — there is no separate `Approval` entity, since a decision is just
+ * one more entry in the same chronological log the analyst's submission is.
+ */
 export interface HistoryEntry {
   id: string;
   campaignId: string;
@@ -10,13 +14,4 @@ export interface HistoryEntry {
   actorRole: Role;
   comment?: string;
   occurredAt: string;
-}
-
-export interface Approval {
-  id: string;
-  campaignId: string;
-  decidedBy: string;
-  decision: ApprovalDecision;
-  comment?: string;
-  decidedAt: string;
 }

@@ -134,11 +134,11 @@ independientemente de lo que la interfaz permita mostrar.
    `campaigns` directamente (solo el backend, vía Admin SDK), y solo puede leer lo que le
    corresponde por rol.
 
-Verificado con pruebas automatizadas (40 tests en `apps/backend`, dominio y casos de uso) y
-manualmente contra el backend real: un token válido de `COMMERCIAL_ANALYST` invocando
-`POST /campaigns/:id/approve` o `POST /campaigns/:id/reject` directamente recibe `403 Forbidden`;
-un token de `APPROVER_MANAGER` invocando `POST /campaigns` para crear una campaña recibe el mismo
-`403`. En ningún caso la evaluación del rol depende de la interfaz.
+Verificado con pruebas automatizadas (93 tests en `apps/backend`: dominio, casos de uso, guards,
+pipe y filtro HTTP) y manualmente contra el backend real: un token válido de `COMMERCIAL_ANALYST`
+invocando `POST /campaigns/:id/approve` o `POST /campaigns/:id/reject` directamente recibe
+`403 Forbidden`; un token de `APPROVER_MANAGER` invocando `POST /campaigns` para crear una campaña
+recibe el mismo `403`. En ningún caso la evaluación del rol depende de la interfaz.
 
 ## Testing
 
@@ -147,9 +147,23 @@ cd apps/backend
 pnpm test
 ```
 
-- `domain/`: máquina de estados y cálculo de costo — funciones puras, sin mocks.
+- `domain/`: máquina de estados y cálculo de costo — funciones puras, sin mocks, incluyendo los
+  cuatro canales y los casos límite de costo (cantidad 0, proveedor sin costo configurado para ese
+  canal).
 - `application/use-cases/`: cada caso de uso probado con un repositorio en memoria (fake), sin
   Firestore ni NestJS.
+- `auth/`: `FirebaseAuthGuard` (token ausente/mal formado/inválido/expirado, claim de rol ausente)
+  y `RolesGuard` (sin usuario, sin `@Roles()`, rol no autorizado) — es la prueba unitaria del
+  "punto crítico" de seguridad del enunciado, antes solo verificado manualmente.
+- `common/`: `ZodValidationPipe` (datos inválidos, campos extra) y `DomainErrorFilter` (cada
+  `DomainError` mapeado a su status HTTP, más el *fallback* 500 que no filtra el mensaje interno).
+- `infrastructure/http/`: `CampaignsController` (cada endpoint delega al caso de uso correcto con
+  los argumentos correctos) y `parseListFilters` (estados inválidos descartados, `pageSize`
+  inválido ignorado en vez de romper la consulta).
+- No cubierto por diseño: los adaptadores de Firestore (`firestore-*.repository.ts`) y
+  `firebase-admin.service.ts` envuelven el SDK de Firebase Admin directamente — mockear su API
+  encadenada aporta poca señal; la cobertura real de esa capa es el Firestore Emulator, que sigue
+  como deuda técnica (ver abajo).
 
 ## Roadmap ejecutado (ventana de 48 horas)
 
@@ -184,3 +198,11 @@ pnpm test
   (DRAFT/REJECTED), el riesgo real es bajo, pero es una simplificación consciente.
 - **Diseño visual**: CSS mínimo inline, sin sistema de diseño ni responsive refinado — explícitamente
   fuera de alcance según el enunciado ("no se busca... refinamiento visual").
+- **Colecciones `users` / `approvals` / módulo `users` de NestJS**: el enunciado las menciona, pero se
+  optó por no crear una colección `users` en Firestore (el rol vive únicamente en el custom claim del
+  token, que es la fuente de verdad que el propio enunciado exige) ni una colección `approvals`
+  separada (cada decisión es una entrada más en la subcolección `history` de la campaña, append-only,
+  que ya cubre "quién, cuándo, decisión, comentario" sin duplicar estado). Aprobar/rechazar vive como
+  acciones del módulo `campaigns` en vez de un módulo `approvals` aparte, porque operan sobre el mismo
+  agregado y transacción. La colección `invoices` no se implementó: liquidaciones y facturación están
+  explícitamente fuera de alcance.

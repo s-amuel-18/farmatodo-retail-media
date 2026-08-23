@@ -1,219 +1,39 @@
 "use client";
 
-import { useEffect } from "react";
-import type { ReactNode } from "react";
-import { useForm } from "react-hook-form";
-import type {
-  Brand,
-  Campaign,
-  ChannelType,
-  MediaCost,
-  NewCampaignInput,
-  PetaloZone,
-  Product,
-  Supplier,
-} from "@farmatodo-retail-media/types";
-
-interface CampaignFormValues {
-  name: string;
-  brandIds: string[];
-  productSkus: string[];
-  supplierId: string;
-  startDate: string;
-  endDate: string;
-  channel: ChannelType;
-  stores: string;
-  quantity: number;
-  zone: PetaloZone;
-  levels: number;
-  category: string;
-  segment: string;
-  estimatedAudience: number;
-  template: string;
-  sendWindowFrom: string;
-  sendWindowTo: string;
-  adAccount: string;
-  objective: string;
-  creatives: string;
-  dailyBudgetUsd: number;
-}
-
-const EMPTY_VALUES: CampaignFormValues = {
-  name: "",
-  brandIds: [],
-  productSkus: [],
-  supplierId: "",
-  startDate: "",
-  endDate: "",
-  channel: "PETALO",
-  stores: "",
-  quantity: 1,
-  zone: "ENTRADA",
-  levels: 1,
-  category: "",
-  segment: "",
-  estimatedAudience: 0,
-  template: "",
-  sendWindowFrom: "",
-  sendWindowTo: "",
-  adAccount: "",
-  objective: "",
-  creatives: "",
-  dailyBudgetUsd: 0,
-};
-
-function toDefaultValues(campaign: Campaign | null): CampaignFormValues {
-  if (!campaign) return EMPTY_VALUES;
-
-  const base = {
-    ...EMPTY_VALUES,
-    name: campaign.name,
-    brandIds: campaign.brandIds,
-    productSkus: campaign.productSkus,
-    supplierId: campaign.supplierId,
-    startDate: campaign.startDate,
-    endDate: campaign.endDate,
-    channel: campaign.channel,
-  };
-
-  switch (campaign.channel) {
-    case "PETALO":
-      return { ...base, stores: campaign.stores.join(", "), quantity: campaign.quantity, zone: campaign.zone };
-    case "PARRILLERA":
-      return {
-        ...base,
-        stores: campaign.stores.join(", "),
-        quantity: campaign.quantity,
-        levels: campaign.levels,
-        category: campaign.category,
-      };
-    case "SMS":
-      return {
-        ...base,
-        segment: campaign.segment,
-        estimatedAudience: campaign.estimatedAudience,
-        template: campaign.template,
-        sendWindowFrom: campaign.sendWindow.from,
-        sendWindowTo: campaign.sendWindow.to,
-      };
-    case "TIKTOK":
-      return {
-        ...base,
-        adAccount: campaign.adAccount,
-        objective: campaign.objective,
-        creatives: campaign.creatives.join(", "),
-        dailyBudgetUsd: campaign.dailyBudgetUsd,
-      };
-  }
-}
-
-function splitList(value: string): string[] {
-  return value
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
-
-function toPayload(values: CampaignFormValues): NewCampaignInput {
-  const common = {
-    name: values.name,
-    brandIds: values.brandIds,
-    productSkus: values.productSkus,
-    supplierId: values.supplierId,
-    startDate: values.startDate,
-    endDate: values.endDate,
-  };
-
-  switch (values.channel) {
-    case "PETALO":
-      return {
-        ...common,
-        channel: "PETALO",
-        stores: splitList(values.stores),
-        quantity: Number(values.quantity),
-        zone: values.zone,
-      };
-    case "PARRILLERA":
-      return {
-        ...common,
-        channel: "PARRILLERA",
-        stores: splitList(values.stores),
-        quantity: Number(values.quantity),
-        levels: Number(values.levels),
-        category: values.category,
-      };
-    case "SMS":
-      return {
-        ...common,
-        channel: "SMS",
-        segment: values.segment,
-        estimatedAudience: Number(values.estimatedAudience),
-        template: values.template,
-        sendWindow: { from: values.sendWindowFrom, to: values.sendWindowTo },
-      };
-    case "TIKTOK":
-      return {
-        ...common,
-        channel: "TIKTOK",
-        adAccount: values.adAccount,
-        objective: values.objective,
-        creatives: splitList(values.creatives),
-        dailyBudgetUsd: Number(values.dailyBudgetUsd),
-      };
-  }
-}
-
-function estimateCost(values: CampaignFormValues, mediaCosts: MediaCost[]): number | null {
-  const found = mediaCosts.find(
-    (m) => m.supplierId === values.supplierId && m.channel === values.channel,
-  );
-  if (!found) return null;
-  const quantity =
-    values.channel === "PETALO" || values.channel === "PARRILLERA" ? Number(values.quantity) || 0 : 1;
-  return Math.round(found.unitCostUsd * quantity * 100) / 100;
-}
+import type { ReactNode, BaseSyntheticEvent } from "react";
+import type { UseFormRegister } from "react-hook-form";
+import type { Brand, Product, Supplier } from "@farmatodo-retail-media/types";
+import type { CampaignFormValues } from "../../view-models/campaigns/useCampaignForm";
 
 interface CampaignFormViewProps {
   mode: "create" | "edit";
-  initialCampaign: Campaign | null;
+  register: UseFormRegister<CampaignFormValues>;
+  values: CampaignFormValues;
+  onSubmit: (event?: BaseSyntheticEvent) => void;
   brands: Brand[];
-  products: Product[];
+  filteredProducts: Product[];
   suppliers: Supplier[];
-  mediaCosts: MediaCost[];
+  estimatedCost: number | null;
   isSubmitting: boolean;
   error: string | null;
-  onSubmit: (payload: NewCampaignInput) => void;
 }
 
 export function CampaignFormView({
   mode,
-  initialCampaign,
+  register,
+  values,
+  onSubmit,
   brands,
-  products,
+  filteredProducts,
   suppliers,
-  mediaCosts,
+  estimatedCost,
   isSubmitting,
   error,
-  onSubmit,
 }: CampaignFormViewProps) {
-  const { register, watch, handleSubmit, reset } = useForm<CampaignFormValues>({
-    defaultValues: toDefaultValues(initialCampaign),
-  });
-
-  useEffect(() => {
-    reset(toDefaultValues(initialCampaign));
-  }, [initialCampaign, reset]);
-
-  const values = watch();
-  const filteredProducts = products.filter((p) => values.brandIds?.includes(p.brandId));
-  const estimatedCost = estimateCost(values, mediaCosts);
-
-  function submit(formValues: CampaignFormValues) {
-    onSubmit(toPayload(formValues));
-  }
+  const channel = values.channel;
 
   return (
-    <form onSubmit={handleSubmit(submit)} style={{ maxWidth: 640 }}>
+    <form onSubmit={onSubmit} style={{ maxWidth: 640 }}>
       <h1 style={{ fontSize: 20, marginBottom: 16 }}>
         {mode === "create" ? "Nueva campaña" : "Editar campaña"}
       </h1>
@@ -271,7 +91,7 @@ export function CampaignFormView({
         </select>
       </Field>
 
-      {values.channel === "PETALO" || values.channel === "PARRILLERA" ? (
+      {channel === "PETALO" || channel === "PARRILLERA" ? (
         <>
           <Field label="Tiendas (separadas por coma)">
             <input {...register("stores")} style={{ width: "100%" }} />
@@ -282,7 +102,7 @@ export function CampaignFormView({
         </>
       ) : null}
 
-      {values.channel === "PETALO" ? (
+      {channel === "PETALO" ? (
         <Field label="Zona">
           <select {...register("zone")}>
             <option value="ENTRADA">Entrada</option>
@@ -292,7 +112,7 @@ export function CampaignFormView({
         </Field>
       ) : null}
 
-      {values.channel === "PARRILLERA" ? (
+      {channel === "PARRILLERA" ? (
         <>
           <Field label="Niveles">
             <input type="number" min={1} {...register("levels", { valueAsNumber: true })} />
@@ -303,7 +123,7 @@ export function CampaignFormView({
         </>
       ) : null}
 
-      {values.channel === "SMS" ? (
+      {channel === "SMS" ? (
         <>
           <Field label="Segmento">
             <input {...register("segment")} style={{ width: "100%" }} />
@@ -325,7 +145,7 @@ export function CampaignFormView({
         </>
       ) : null}
 
-      {values.channel === "TIKTOK" ? (
+      {channel === "TIKTOK" ? (
         <>
           <Field label="Cuenta publicitaria">
             <input {...register("adAccount")} style={{ width: "100%" }} />

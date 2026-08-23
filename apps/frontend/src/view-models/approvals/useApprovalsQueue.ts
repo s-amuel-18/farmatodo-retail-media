@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CampaignListFilters } from "@farmatodo-retail-media/types";
 import { approvalsService } from "../../services/approvals.service";
 import { campaignsService } from "../../services/campaigns.service";
-import type { FiltersBarValue } from "../../views/shared/FiltersBar";
+import type { FiltersBarValue } from "../shared/filters";
 
 const DEFAULT_FILTERS: FiltersBarValue = { status: ["PENDING_APPROVAL"], dateFrom: "", dateTo: "" };
 

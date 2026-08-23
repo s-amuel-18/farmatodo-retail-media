@@ -1,4 +1,5 @@
 import type { CampaignStatus } from "@farmatodo-retail-media/types";
+import type { FiltersBarValue } from "../../view-models/shared/filters";
 
 const ALL_STATUSES: CampaignStatus[] = ["DRAFT", "PENDING_APPROVAL", "APPROVED", "REJECTED"];
 
@@ -8,12 +9,6 @@ const LABELS: Record<CampaignStatus, string> = {
   APPROVED: "Aprobada",
   REJECTED: "Rechazada",
 };
-
-export interface FiltersBarValue {
-  status: CampaignStatus[];
-  dateFrom: string;
-  dateTo: string;
-}
 
 interface FiltersBarProps {
   value: FiltersBarValue;
