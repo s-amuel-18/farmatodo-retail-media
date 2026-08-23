@@ -1,3 +1,5 @@
+import type { DistributiveOmit } from "./utils";
+
 export type ChannelType = "PETALO" | "PARRILLERA" | "SMS" | "TIKTOK";
 
 export type CampaignStatus =
@@ -59,6 +61,21 @@ export type Campaign =
   | ParrilleraCampaign
   | SmsCampaign
   | TiktokCampaign;
+
+/**
+ * Shape used both by the create/edit form (frontend) and the create/update
+ * use cases (backend) — server-assigned fields (id, status, totalCostUsd,
+ * createdBy, createdAt, currentApprovalComment) are never part of client input.
+ */
+export type NewCampaignInput = DistributiveOmit<
+  Campaign,
+  | "id"
+  | "createdAt"
+  | "status"
+  | "totalCostUsd"
+  | "createdBy"
+  | "currentApprovalComment"
+>;
 
 export interface Brand {
   id: string;
