@@ -6,6 +6,7 @@ import type { CampaignListFilters } from "@farmatodo-retail-media/types";
 import { approvalsService } from "../../services/approvals.service";
 import { campaignsService } from "../../services/campaigns.service";
 import type { FiltersBarValue } from "../shared/filters";
+import { useToast } from "../shared/toast-context";
 
 const DEFAULT_FILTERS: FiltersBarValue = { status: ["PENDING_APPROVAL"], dateFrom: "", dateTo: "" };
 
@@ -14,6 +15,7 @@ export function useApprovalsQueue() {
   const [cursorStack, setCursorStack] = useState<string[]>([]);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   const apiFilters: CampaignListFilters = useMemo(
     () => ({
@@ -39,6 +41,7 @@ export function useApprovalsQueue() {
     onSuccess: () => {
       invalidate();
       setStatusMessage("Campaña aprobada.");
+      showToast("Campaña aprobada.", "approved");
     },
   });
 
@@ -48,6 +51,7 @@ export function useApprovalsQueue() {
     onSuccess: () => {
       invalidate();
       setStatusMessage("Campaña rechazada.");
+      showToast("Campaña rechazada.", "rejected");
     },
   });
 
@@ -72,6 +76,11 @@ export function useApprovalsQueue() {
     actions: {
       approve: (campaignId: string) => approve.mutateAsync(campaignId),
       reject: (campaignId: string, comment: string) => reject.mutateAsync({ campaignId, comment }),
+      pendingCampaignId: approve.isPending
+        ? (approve.variables ?? null)
+        : reject.isPending
+          ? (reject.variables?.campaignId ?? null)
+          : null,
     },
     decision: {
       isPending: approve.isPending || reject.isPending,

@@ -40,6 +40,7 @@ interface ApprovalsQueueViewProps {
   onReject: (campaignId: string, comment: string) => Promise<unknown>;
   decisionError: string | null;
   statusMessage: string | null;
+  pendingCampaignId: string | null;
 }
 
 export function ApprovalsQueueView({
@@ -53,9 +54,11 @@ export function ApprovalsQueueView({
   onReject,
   decisionError,
   statusMessage,
+  pendingCampaignId,
 }: ApprovalsQueueViewProps) {
   const [rejecting, setRejecting] = useState<{ id: string; comment: string } | null>(null);
   const [rejectError, setRejectError] = useState<string | null>(null);
+  const [approving, setApproving] = useState<{ id: string; name: string } | null>(null);
 
   return (
     <div>
@@ -107,15 +110,15 @@ export function ApprovalsQueueView({
                       <Button
                         size="sm"
                         variant="primary"
-                        onClick={() => {
-                          onApprove(campaign.id).catch(() => {});
-                        }}
+                        disabled={pendingCampaignId === campaign.id}
+                        onClick={() => setApproving({ id: campaign.id, name: campaign.name })}
                       >
-                        Aprobar
+                        {pendingCampaignId === campaign.id ? "Aprobando..." : "Aprobar"}
                       </Button>
                       <Button
                         size="sm"
                         variant="secondary"
+                        disabled={pendingCampaignId === campaign.id}
                         onClick={() => {
                           setRejectError(null);
                           setRejecting({ id: campaign.id, comment: "" });
@@ -161,6 +164,29 @@ export function ApprovalsQueueView({
               }}
             >
               Confirmar rechazo
+            </Button>
+          </div>
+        </Modal>
+      ) : null}
+
+      {approving ? (
+        <Modal title="Confirmar aprobación" onClose={() => setApproving(null)}>
+          <p className="mb-4 text-sm text-ink">
+            Vas a aprobar <strong>{approving.name}</strong>. Esta decisión es definitiva y no se puede deshacer
+            desde la plataforma.
+          </p>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setApproving(null)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                onApprove(approving.id).catch(() => {});
+                setApproving(null);
+              }}
+            >
+              Confirmar aprobación
             </Button>
           </div>
         </Modal>

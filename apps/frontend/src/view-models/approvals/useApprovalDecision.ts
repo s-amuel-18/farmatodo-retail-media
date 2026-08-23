@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { approvalsService } from "../../services/approvals.service";
+import { useToast } from "../shared/toast-context";
 
 export function useApprovalDecision(campaignId: string) {
   const queryClient = useQueryClient();
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   function invalidate() {
     queryClient.invalidateQueries({ queryKey: ["campaigns"] });
@@ -17,6 +19,7 @@ export function useApprovalDecision(campaignId: string) {
     onSuccess: () => {
       invalidate();
       setStatusMessage("Campaña aprobada.");
+      showToast("Campaña aprobada.", "approved");
     },
   });
 
@@ -25,6 +28,7 @@ export function useApprovalDecision(campaignId: string) {
     onSuccess: () => {
       invalidate();
       setStatusMessage("Campaña rechazada.");
+      showToast("Campaña rechazada.", "rejected");
     },
   });
 

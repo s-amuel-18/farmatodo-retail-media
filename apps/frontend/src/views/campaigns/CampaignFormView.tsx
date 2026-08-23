@@ -12,6 +12,7 @@ interface CampaignFormViewProps {
   mode: "create" | "edit";
   register: UseFormRegister<CampaignFormValues>;
   errors: FieldErrors<CampaignFormValues>;
+  fieldErrors: Record<string, string>;
   values: CampaignFormValues;
   onSubmit: (event?: BaseSyntheticEvent) => void;
   brands: Brand[];
@@ -29,6 +30,7 @@ export function CampaignFormView({
   mode,
   register,
   errors,
+  fieldErrors,
   values,
   onSubmit,
   brands,
@@ -50,11 +52,15 @@ export function CampaignFormView({
         {mode === "create" ? "Nueva campaña" : "Editar campaña"}
       </h1>
 
-      <Field label="Nombre" required error={errors.name?.message}>
+      <Field label="Nombre" required error={errors.name?.message ?? fieldErrors.name}>
         <Input {...register("name", { required: REQUIRED_MESSAGE })} />
       </Field>
 
-      <Field label="Marca(s)" hint="Mantén presionado Ctrl (Cmd en Mac) para elegir varias.">
+      <Field
+        label="Marca(s)"
+        hint={values.brandIds?.length ? undefined : "Selecciona al menos una marca para ver sus productos."}
+        error={fieldErrors.brandIds}
+      >
         <Select multiple {...register("brandIds")} className="h-20">
           {brands.map((b) => (
             <option key={b.id} value={b.id}>
@@ -64,7 +70,15 @@ export function CampaignFormView({
         </Select>
       </Field>
 
-      <Field label="Producto(s) (SKU)" hint="Mantén presionado Ctrl (Cmd en Mac) para elegir varios.">
+      <Field
+        label="Producto(s) (SKU)"
+        hint={
+          values.brandIds?.length && filteredProducts.length === 0
+            ? "La(s) marca(s) seleccionada(s) no tienen productos registrados."
+            : undefined
+        }
+        error={fieldErrors.productSkus}
+      >
         <Select multiple {...register("productSkus")} className="h-20">
           {filteredProducts.map((p) => (
             <option key={p.sku} value={p.sku}>
@@ -74,7 +88,7 @@ export function CampaignFormView({
         </Select>
       </Field>
 
-      <Field label="Proveedor" required error={errors.supplierId?.message}>
+      <Field label="Proveedor" required error={errors.supplierId?.message ?? fieldErrors.supplierId}>
         <Select {...register("supplierId", { required: REQUIRED_MESSAGE })}>
           <option value="">Selecciona...</option>
           {suppliers.map((s) => (
@@ -86,15 +100,18 @@ export function CampaignFormView({
       </Field>
 
       <div className="flex gap-3">
-        <Field label="Fecha inicio" required error={errors.startDate?.message}>
+        <Field label="Fecha inicio" required error={errors.startDate?.message ?? fieldErrors.startDate}>
           <Input type="date" {...register("startDate", { required: REQUIRED_MESSAGE })} />
         </Field>
-        <Field label="Fecha fin" required error={errors.endDate?.message}>
+        <Field label="Fecha fin" required error={errors.endDate?.message ?? fieldErrors.endDate}>
           <Input type="date" {...register("endDate", { required: REQUIRED_MESSAGE })} />
         </Field>
       </div>
 
-      <Field label="Medio de exhibición">
+      <Field
+        label="Medio de exhibición"
+        hint={mode === "edit" ? "El canal no se puede cambiar una vez creada la campaña." : undefined}
+      >
         <Select {...register("channel")} disabled={mode === "edit"}>
           {CHANNEL_TYPES.map((channel) => (
             <option key={channel} value={channel}>
@@ -106,17 +123,17 @@ export function CampaignFormView({
 
       {channel === "PETALO" || channel === "PARRILLERA" ? (
         <>
-          <Field label="Tiendas (separadas por coma)">
+          <Field label="Tiendas (separadas por coma)" error={fieldErrors.stores}>
             <Input {...register("stores")} />
           </Field>
-          <Field label="Cantidad">
+          <Field label="Cantidad" error={fieldErrors.quantity}>
             <Input type="number" min={1} {...register("quantity", { valueAsNumber: true })} />
           </Field>
         </>
       ) : null}
 
       {channel === "PETALO" ? (
-        <Field label="Zona">
+        <Field label="Zona" error={fieldErrors.zone}>
           <Select {...register("zone")}>
             {PETALO_ZONES.map((zone) => (
               <option key={zone} value={zone}>
@@ -129,10 +146,10 @@ export function CampaignFormView({
 
       {channel === "PARRILLERA" ? (
         <>
-          <Field label="Niveles">
+          <Field label="Niveles" error={fieldErrors.levels}>
             <Input type="number" min={1} {...register("levels", { valueAsNumber: true })} />
           </Field>
-          <Field label="Categoría">
+          <Field label="Categoría" error={fieldErrors.category}>
             <Input {...register("category")} />
           </Field>
         </>
@@ -140,20 +157,20 @@ export function CampaignFormView({
 
       {channel === "SMS" ? (
         <>
-          <Field label="Segmento">
+          <Field label="Segmento" error={fieldErrors.segment}>
             <Input {...register("segment")} />
           </Field>
-          <Field label="Audiencia estimada">
+          <Field label="Audiencia estimada" error={fieldErrors.estimatedAudience}>
             <Input type="number" min={0} {...register("estimatedAudience", { valueAsNumber: true })} />
           </Field>
-          <Field label="Plantilla de mensaje">
+          <Field label="Plantilla de mensaje" error={fieldErrors.template}>
             <Textarea {...register("template")} rows={3} />
           </Field>
           <div className="flex gap-3">
-            <Field label="Ventana de envío - desde">
+            <Field label="Ventana de envío - desde" error={fieldErrors.sendWindowFrom}>
               <Input type="time" {...register("sendWindowFrom")} />
             </Field>
-            <Field label="Ventana de envío - hasta">
+            <Field label="Ventana de envío - hasta" error={fieldErrors.sendWindowTo}>
               <Input type="time" {...register("sendWindowTo")} />
             </Field>
           </div>
@@ -162,16 +179,16 @@ export function CampaignFormView({
 
       {channel === "TIKTOK" ? (
         <>
-          <Field label="Cuenta publicitaria">
+          <Field label="Cuenta publicitaria" error={fieldErrors.adAccount}>
             <Input {...register("adAccount")} />
           </Field>
-          <Field label="Objetivo">
+          <Field label="Objetivo" error={fieldErrors.objective}>
             <Input {...register("objective")} />
           </Field>
-          <Field label="Creativos (separados por coma)">
+          <Field label="Creativos (separados por coma)" error={fieldErrors.creatives}>
             <Input {...register("creatives")} />
           </Field>
-          <Field label="Presupuesto diario (USD)">
+          <Field label="Presupuesto diario (USD)" error={fieldErrors.dailyBudgetUsd}>
             <Input type="number" min={0} step="0.01" {...register("dailyBudgetUsd", { valueAsNumber: true })} />
           </Field>
         </>

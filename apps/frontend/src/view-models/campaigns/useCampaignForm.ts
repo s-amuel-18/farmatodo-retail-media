@@ -179,6 +179,22 @@ function estimateCost(values: CampaignFormValues, mediaCosts: MediaCost[]): numb
   return Math.round(found.unitCostUsd * quantity * 100) / 100;
 }
 
+/** Maps a zod issue path on the API payload back to the form field it came from. */
+const PAYLOAD_PATH_TO_FIELD: Record<string, keyof CampaignFormValues> = {
+  "sendWindow.from": "sendWindowFrom",
+  "sendWindow.to": "sendWindowTo",
+};
+
+function toFieldErrors(issues: { path: (string | number)[]; message: string }[]): Record<string, string> {
+  const errors: Record<string, string> = {};
+  for (const issue of issues) {
+    const path = issue.path.join(".");
+    const field = PAYLOAD_PATH_TO_FIELD[path] ?? path;
+    if (!errors[field]) errors[field] = issue.message;
+  }
+  return errors;
+}
+
 type SaveTarget = { mode: "create" } | { mode: "edit"; campaignId: string };
 
 export interface UseCampaignFormParams {
@@ -192,6 +208,7 @@ export function useCampaignForm({ target, initialCampaign, products, mediaCosts 
   const router = useRouter();
   const queryClient = useQueryClient();
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const {
     register,
@@ -224,9 +241,15 @@ export function useCampaignForm({ target, initialCampaign, products, mediaCosts 
 
   function onValid(formValues: CampaignFormValues): void {
     setValidationError(null);
+    setFieldErrors({});
     const result = newCampaignInputSchema.safeParse(toPayload(formValues));
     if (!result.success) {
-      setValidationError(result.error.issues[0]?.message ?? "Datos inválidos");
+      setFieldErrors(toFieldErrors(result.error.issues));
+      setValidationError(
+        result.error.issues.length > 1
+          ? "Hay varios campos con errores. Revisa los mensajes marcados en rojo."
+          : (result.error.issues[0]?.message ?? "Datos inválidos"),
+      );
       return;
     }
     mutation.mutate(result.data);
@@ -244,6 +267,7 @@ export function useCampaignForm({ target, initialCampaign, products, mediaCosts 
     filteredProducts,
     estimatedCost,
     isSubmitting: mutation.isPending,
+    fieldErrors,
     error: validationError ?? (mutation.error instanceof Error ? mutation.error.message : null),
   };
 }

@@ -18,6 +18,7 @@ export default function CampaignsInboxPage() {
       onSubmit={actions.submit}
       submitError={submitError}
       statusMessage={statusMessage}
+      pendingCampaignId={actions.pendingCampaignId}
     />
   );
 }

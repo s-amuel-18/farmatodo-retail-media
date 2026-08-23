@@ -19,6 +19,7 @@ export default function ApprovalsQueuePage() {
       onReject={actions.reject}
       decisionError={decision.error}
       statusMessage={statusMessage}
+      pendingCampaignId={actions.pendingCampaignId}
     />
   );
 }

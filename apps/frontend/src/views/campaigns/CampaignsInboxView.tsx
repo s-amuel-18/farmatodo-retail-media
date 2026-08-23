@@ -34,6 +34,7 @@ interface CampaignsInboxViewProps {
   onSubmit: (campaignId: string) => Promise<unknown>;
   submitError?: string | null;
   statusMessage?: string | null;
+  pendingCampaignId: string | null;
 }
 
 export function CampaignsInboxView({
@@ -46,6 +47,7 @@ export function CampaignsInboxView({
   onSubmit,
   submitError,
   statusMessage,
+  pendingCampaignId,
 }: CampaignsInboxViewProps) {
   return (
     <div>
@@ -92,7 +94,7 @@ export function CampaignsInboxView({
                     {campaign.name}
                   </Link>
                   {campaign.status === "REJECTED" && campaign.currentApprovalComment ? (
-                    <p className="mt-1 text-xs text-danger-600">
+                    <p className="mt-1 text-xs font-medium text-status-rejected-fg">
                       Rechazada: {campaign.currentApprovalComment}
                     </p>
                   ) : null}
@@ -114,12 +116,13 @@ export function CampaignsInboxView({
                       <Button
                         variant="ghost"
                         size="sm"
+                        disabled={pendingCampaignId === campaign.id}
                         onClick={() => {
                           onSubmit(campaign.id).catch(() => {});
                         }}
-                        className="h-auto p-0 font-medium text-brand-blue-700 hover:bg-transparent hover:underline"
+                        className="h-auto p-0 font-medium text-brand-blue-700 hover:bg-transparent hover:underline disabled:bg-transparent"
                       >
-                        Enviar a aprobación
+                        {pendingCampaignId === campaign.id ? "Enviando..." : "Enviar a aprobación"}
                       </Button>
                     </div>
                   ) : null}

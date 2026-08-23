@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import type { Campaign, HistoryEntry } from "@farmatodo-retail-media/types";
 import { StatusBadge } from "../shared/StatusBadge";
-import { Button, ErrorText, Field, LoadingState, Textarea } from "@/components/ui";
+import { Button, ErrorText, Field, LoadingState, Modal, Textarea } from "@/components/ui";
 import { CHANNEL_LABELS, HISTORY_ACTION_LABELS, PETALO_ZONE_LABELS } from "@/lib/campaign-vocabulary";
 
 function channelDetails(campaign: Campaign): Array<[string, string]> {
@@ -46,9 +46,12 @@ interface CampaignDetailViewProps {
   isLoading: boolean;
   error: string | null;
   backHref: string;
+  supplierLabel: string;
+  brandLabels: string;
   approverActions?: {
     onApprove: () => Promise<unknown>;
     onReject: (comment: string) => Promise<unknown>;
+    isDeciding: boolean;
   };
   decisionError?: string | null;
   statusMessage?: string | null;
@@ -60,6 +63,8 @@ export function CampaignDetailView({
   isLoading,
   error,
   backHref,
+  supplierLabel,
+  brandLabels,
   approverActions,
   decisionError,
   statusMessage,
@@ -67,6 +72,7 @@ export function CampaignDetailView({
   const [rejectComment, setRejectComment] = useState("");
   const [isRejecting, setIsRejecting] = useState(false);
   const [rejectError, setRejectError] = useState<string | null>(null);
+  const [isConfirmingApprove, setIsConfirmingApprove] = useState(false);
 
   if (isLoading) return <LoadingState />;
   if (error) return <ErrorText>{error}</ErrorText>;
@@ -86,16 +92,22 @@ export function CampaignDetailView({
       </div>
 
       {campaign.status === "REJECTED" && campaign.currentApprovalComment ? (
-        <p className="mb-3 text-sm text-danger-600">
-          Motivo del rechazo: {campaign.currentApprovalComment}
-        </p>
+        <div className="mb-4 rounded-control border border-status-rejected-fg/20 bg-status-rejected-bg px-4 py-3 text-sm text-status-rejected-fg">
+          <p className="font-semibold">Motivo del rechazo</p>
+          <p className="mt-1">{campaign.currentApprovalComment}</p>
+          {!approverActions ? (
+            <p className="mt-2 text-status-rejected-fg/80">
+              Edita la campaña y vuelve a enviarla para aprobación cuando esté lista.
+            </p>
+          ) : null}
+        </div>
       ) : null}
       {decisionError ? <ErrorText>{decisionError}</ErrorText> : null}
 
       <Section title="Datos generales">
         <Row label="Canal" value={CHANNEL_LABELS[campaign.channel]} />
-        <Row label="Proveedor" value={campaign.supplierId} />
-        <Row label="Marcas" value={campaign.brandIds.join(", ")} />
+        <Row label="Proveedor" value={supplierLabel} />
+        <Row label="Marcas" value={brandLabels} />
         <Row label="Productos (SKU)" value={campaign.productSkus.join(", ")} />
         <Row label="Fecha inicio" value={campaign.startDate} />
         <Row label="Fecha fin" value={campaign.endDate} />
@@ -118,7 +130,11 @@ export function CampaignDetailView({
                 <strong className="text-ink">{HISTORY_ACTION_LABELS[entry.action]}</strong>
                 {" — "}
                 {new Date(entry.occurredAt).toLocaleString()}
-                {entry.comment ? <div className="text-danger-600">Comentario: {entry.comment}</div> : null}
+                {entry.comment ? (
+                  <div className={entry.action === "REJECTED" ? "text-status-rejected-fg" : "text-text-muted"}>
+                    Comentario: {entry.comment}
+                  </div>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -130,16 +146,16 @@ export function CampaignDetailView({
           <div className="mb-2 flex gap-2">
             <Button
               variant="primary"
-              onClick={() => {
-                approverActions.onApprove().catch(() => {});
-              }}
+              disabled={approverActions.isDeciding}
+              onClick={() => setIsConfirmingApprove(true)}
             >
-              Aprobar
+              {approverActions.isDeciding ? "Procesando..." : "Aprobar"}
             </Button>
             <Button
               variant="secondary"
               aria-expanded={isRejecting}
               aria-controls="reject-comment-panel"
+              disabled={approverActions.isDeciding}
               onClick={() => {
                 setRejectError(null);
                 setIsRejecting(true);
@@ -177,6 +193,29 @@ export function CampaignDetailView({
             </div>
           ) : null}
         </Section>
+      ) : null}
+
+      {isConfirmingApprove && approverActions ? (
+        <Modal title="Confirmar aprobación" onClose={() => setIsConfirmingApprove(false)}>
+          <p className="mb-4 text-sm text-ink">
+            Vas a aprobar <strong>{campaign.name}</strong>. Esta decisión es definitiva y no se puede deshacer
+            desde la plataforma.
+          </p>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setIsConfirmingApprove(false)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                approverActions.onApprove().catch(() => {});
+                setIsConfirmingApprove(false);
+              }}
+            >
+              Confirmar aprobación
+            </Button>
+          </div>
+        </Modal>
       ) : null}
     </div>
   );
