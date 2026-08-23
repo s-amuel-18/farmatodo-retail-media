@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CampaignListFilters } from "@farmatodo-retail-media/types";
 import { campaignsService } from "../../services/campaigns.service";
-import type { FiltersBarValue } from "../../views/shared/FiltersBar";
+import type { FiltersBarValue } from "../shared/filters";
 
 const EMPTY_FILTERS: FiltersBarValue = { status: [], dateFrom: "", dateTo: "" };
 

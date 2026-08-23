@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Campaign } from "@farmatodo-retail-media/types";
 import { StatusBadge } from "../shared/StatusBadge";
-import { FiltersBar, type FiltersBarValue } from "../shared/FiltersBar";
+import { FiltersBar } from "../shared/FiltersBar";
+import type { FiltersBarValue } from "../../view-models/shared/filters";
 import { Pagination } from "../shared/Pagination";
 
 interface CampaignsInboxViewProps {
