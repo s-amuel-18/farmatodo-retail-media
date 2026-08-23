@@ -28,6 +28,8 @@ export class FirebaseAdminService implements OnModuleInit {
       credential: admin.credential.cert(serviceAccount),
       projectId,
     });
+
+    this.app.firestore().settings({ ignoreUndefinedProperties: true });
   }
 
   auth(): admin.auth.Auth {

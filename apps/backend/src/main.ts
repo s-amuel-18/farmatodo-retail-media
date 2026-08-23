@@ -1,7 +1,9 @@
 import "reflect-metadata";
+import * as dotenv from "dotenv";
+dotenv.config();
 import { NestFactory } from "@nestjs/core";
-import { ValidationPipe } from "@nestjs/common";
 import { AppModule } from "./app.module";
+import { DomainErrorFilter } from "./common/domain-error.filter";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,9 +13,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.useGlobalPipes(
-    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
-  );
+  app.useGlobalFilters(new DomainErrorFilter());
 
   const port = process.env.PORT ? Number(process.env.PORT) : 3001;
   await app.listen(port);
