@@ -1,11 +1,5 @@
+import { CAMPAIGN_STATUSES } from "@farmatodo-retail-media/types";
 import type { CampaignListFilters, CampaignStatus } from "@farmatodo-retail-media/types";
-
-const VALID_STATUSES: CampaignStatus[] = [
-  "DRAFT",
-  "PENDING_APPROVAL",
-  "APPROVED",
-  "REJECTED",
-];
 
 export interface ListCampaignsQueryDto {
   status?: string; // comma-separated, e.g. "DRAFT,REJECTED"
@@ -22,7 +16,7 @@ export function parseListFilters(query: ListCampaignsQueryDto): CampaignListFilt
     const statuses = query.status
       .split(",")
       .map((s) => s.trim())
-      .filter((s): s is CampaignStatus => VALID_STATUSES.includes(s as CampaignStatus));
+      .filter((s): s is CampaignStatus => CAMPAIGN_STATUSES.includes(s as CampaignStatus));
     if (statuses.length > 0) filters.status = statuses;
   }
   if (query.dateFrom) filters.dateFrom = query.dateFrom;

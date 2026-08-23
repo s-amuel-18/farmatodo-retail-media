@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CAMPAIGN_STATUSES } from "./campaign";
 
 /**
  * Mirrors `NewCampaignInput` from campaign.ts. Kept in this shared package so
@@ -60,12 +61,7 @@ export const rejectCampaignSchema = z.object({
   comment: z.string().trim().min(1, "El comentario de rechazo es obligatorio"),
 });
 
-export const campaignStatusSchema = z.enum([
-  "DRAFT",
-  "PENDING_APPROVAL",
-  "APPROVED",
-  "REJECTED",
-]);
+export const campaignStatusSchema = z.enum(CAMPAIGN_STATUSES);
 
 export const campaignListFiltersSchema = z.object({
   status: z.array(campaignStatusSchema).optional(),

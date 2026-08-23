@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import type * as admin from "firebase-admin";
+import { CAMPAIGN_HISTORY_SUBCOLLECTION, FIRESTORE_COLLECTIONS } from "@farmatodo-retail-media/types";
 import type {
   Campaign,
   CampaignListFilters,
@@ -11,7 +12,6 @@ import { CampaignNotFoundError } from "../../domain/errors";
 import type { CampaignDraft, CampaignRepository, Decide } from "../../application/ports/campaign-repository.port";
 import { FirebaseAdminService } from "../../../firebase/firebase-admin.service";
 
-const COLLECTION = "campaigns";
 const DEFAULT_PAGE_SIZE = 20;
 
 @Injectable()
@@ -19,7 +19,7 @@ export class FirestoreCampaignRepository implements CampaignRepository {
   constructor(private readonly firebaseAdmin: FirebaseAdminService) {}
 
   private collection() {
-    return this.firebaseAdmin.firestore().collection(COLLECTION);
+    return this.firebaseAdmin.firestore().collection(FIRESTORE_COLLECTIONS.campaigns);
   }
 
   async findById(id: string): Promise<Campaign | null> {
@@ -68,7 +68,7 @@ export class FirestoreCampaignRepository implements CampaignRepository {
       const { campaign, historyEntry } = decide(current);
 
       tx.set(ref, campaignToDoc(campaign));
-      const historyRef = ref.collection("history").doc();
+      const historyRef = ref.collection(CAMPAIGN_HISTORY_SUBCOLLECTION).doc();
       tx.set(historyRef, { ...historyEntry, id: historyRef.id });
 
       return campaign;
@@ -103,7 +103,7 @@ export class FirestoreCampaignRepository implements CampaignRepository {
   async listHistory(campaignId: string): Promise<HistoryEntry[]> {
     const snap = await this.collection()
       .doc(campaignId)
-      .collection("history")
+      .collection(CAMPAIGN_HISTORY_SUBCOLLECTION)
       .orderBy("occurredAt", "asc")
       .get();
 

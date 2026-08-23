@@ -1,7 +1,6 @@
 import type { AuthenticatedUser, Campaign } from "@farmatodo-retail-media/types";
+import { EDITABLE_CAMPAIGN_STATUSES } from "@farmatodo-retail-media/types";
 import { ForbiddenActionError, InvalidTransitionError } from "./errors";
-
-const EDITABLE_STATUSES: Campaign["status"][] = ["DRAFT", "REJECTED"];
 
 /**
  * "El analista puede editarlas libremente [...] en DRAFT" (or REJECTED, to fix
@@ -13,7 +12,7 @@ export function assertEditable(campaign: Campaign, actor: AuthenticatedUser): vo
   if (actor.role !== "COMMERCIAL_ANALYST" || actor.uid !== campaign.createdBy) {
     throw new ForbiddenActionError("EDIT", actor.role);
   }
-  if (!EDITABLE_STATUSES.includes(campaign.status)) {
+  if (!EDITABLE_CAMPAIGN_STATUSES.includes(campaign.status)) {
     throw new InvalidTransitionError(campaign.status, "EDIT");
   }
 }

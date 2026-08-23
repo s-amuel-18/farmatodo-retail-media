@@ -2,11 +2,30 @@ import type { DistributiveOmit } from "./utils";
 
 export type ChannelType = "PETALO" | "PARRILLERA" | "SMS" | "TIKTOK";
 
-export type CampaignStatus =
-  | "DRAFT"
-  | "PENDING_APPROVAL"
-  | "APPROVED"
-  | "REJECTED";
+/**
+ * Single source of truth for the campaign status enum. Both the zod schema
+ * (schemas.ts) and every place that needs to enumerate statuses (frontend
+ * filters, backend query parsing) derive from this instead of re-listing the
+ * four strings.
+ */
+export const CAMPAIGN_STATUSES = [
+  "DRAFT",
+  "PENDING_APPROVAL",
+  "APPROVED",
+  "REJECTED",
+] as const;
+
+export type CampaignStatus = (typeof CAMPAIGN_STATUSES)[number];
+
+/**
+ * "El analista puede editarlas libremente [...] en DRAFT" (or REJECTED, to fix
+ * and resubmit). Shared so the backend's edit guard and the frontend's "can
+ * this campaign be edited" checks never drift apart.
+ */
+export const EDITABLE_CAMPAIGN_STATUSES: readonly CampaignStatus[] = [
+  "DRAFT",
+  "REJECTED",
+];
 
 export type PetaloZone = "ENTRADA" | "PASILLO_CENTRAL" | "CAJAS";
 

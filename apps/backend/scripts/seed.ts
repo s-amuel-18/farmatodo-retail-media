@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import { FIRESTORE_COLLECTIONS } from "@farmatodo-retail-media/types";
 import type { Brand, MediaCost, Product, Supplier } from "@farmatodo-retail-media/types";
 import { initAdmin } from "./lib/init-admin";
 
@@ -42,10 +43,10 @@ async function seedByField<T>(
 
 async function main() {
   initAdmin();
-  await seedByField("suppliers", suppliers, (s) => s.id);
-  await seedByField("brands", brands, (b) => b.id);
-  await seedByField("products", products, (p) => p.sku);
-  await seedByField("mediaCosts", mediaCosts, (m) => m.id);
+  await seedByField(FIRESTORE_COLLECTIONS.suppliers, suppliers, (s) => s.id);
+  await seedByField(FIRESTORE_COLLECTIONS.brands, brands, (b) => b.id);
+  await seedByField(FIRESTORE_COLLECTIONS.products, products, (p) => p.sku);
+  await seedByField(FIRESTORE_COLLECTIONS.mediaCosts, mediaCosts, (m) => m.id);
 }
 
 main()
