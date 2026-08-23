@@ -3,7 +3,8 @@
 import type { ReactNode } from "react";
 import { useSession } from "@/view-models/session/session-context";
 import { AppHeader } from "@/views/shared/AppHeader";
-import { ROLE_LABELS, ROLE_HOME_ROUTE } from "@/lib/campaign-vocabulary";
+import { ROLE_LABELS } from "@/lib/campaign-vocabulary";
+import { ROLE_HOME_ROUTE } from "@/lib/role-routes";
 
 export default function ProtectedLayout({ children }: { children: ReactNode }) {
   const { user, actions } = useSession();
