@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import type { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import type {
   Brand,
@@ -13,6 +12,8 @@ import type {
   Product,
   Supplier,
 } from "@farmatodo-retail-media/types";
+import { Button, ErrorText, Field, Input, Select, Textarea } from "@/components/ui";
+import { CHANNEL_LABELS, CHANNEL_TYPES, PETALO_ZONES, PETALO_ZONE_LABELS } from "@/lib/campaign-vocabulary";
 
 interface CampaignFormValues {
   name: string;
@@ -213,92 +214,95 @@ export function CampaignFormView({
   }
 
   return (
-    <form onSubmit={handleSubmit(submit)} style={{ maxWidth: 640 }}>
-      <h1 style={{ fontSize: 20, marginBottom: 16 }}>
+    <form onSubmit={handleSubmit(submit)} className="max-w-2xl">
+      <h1 className="mb-4 text-xl font-semibold text-navy-900">
         {mode === "create" ? "Nueva campaña" : "Editar campaña"}
       </h1>
 
       <Field label="Nombre">
-        <input {...register("name", { required: true })} style={{ width: "100%" }} />
+        <Input {...register("name", { required: true })} />
       </Field>
 
       <Field label="Marca(s)">
-        <select multiple {...register("brandIds")} style={{ width: "100%", height: 80 }}>
+        <Select multiple {...register("brandIds")} className="h-20">
           {brands.map((b) => (
             <option key={b.id} value={b.id}>
               {b.name}
             </option>
           ))}
-        </select>
+        </Select>
       </Field>
 
       <Field label="Producto(s) (SKU)">
-        <select multiple {...register("productSkus")} style={{ width: "100%", height: 80 }}>
+        <Select multiple {...register("productSkus")} className="h-20">
           {filteredProducts.map((p) => (
             <option key={p.sku} value={p.sku}>
               {p.name}
             </option>
           ))}
-        </select>
+        </Select>
       </Field>
 
       <Field label="Proveedor">
-        <select {...register("supplierId", { required: true })} style={{ width: "100%" }}>
+        <Select {...register("supplierId", { required: true })}>
           <option value="">Selecciona...</option>
           {suppliers.map((s) => (
             <option key={s.id} value={s.id}>
               {s.name}
             </option>
           ))}
-        </select>
+        </Select>
       </Field>
 
-      <div style={{ display: "flex", gap: 12 }}>
+      <div className="flex gap-3">
         <Field label="Fecha inicio">
-          <input type="date" {...register("startDate", { required: true })} />
+          <Input type="date" {...register("startDate", { required: true })} />
         </Field>
         <Field label="Fecha fin">
-          <input type="date" {...register("endDate", { required: true })} />
+          <Input type="date" {...register("endDate", { required: true })} />
         </Field>
       </div>
 
       <Field label="Medio de exhibición">
-        <select {...register("channel")} disabled={mode === "edit"} style={{ width: "100%" }}>
-          <option value="PETALO">Pétalo</option>
-          <option value="PARRILLERA">Parrillera</option>
-          <option value="SMS">SMS</option>
-          <option value="TIKTOK">TikTok</option>
-        </select>
+        <Select {...register("channel")} disabled={mode === "edit"}>
+          {CHANNEL_TYPES.map((channel) => (
+            <option key={channel} value={channel}>
+              {CHANNEL_LABELS[channel]}
+            </option>
+          ))}
+        </Select>
       </Field>
 
       {values.channel === "PETALO" || values.channel === "PARRILLERA" ? (
         <>
           <Field label="Tiendas (separadas por coma)">
-            <input {...register("stores")} style={{ width: "100%" }} />
+            <Input {...register("stores")} />
           </Field>
           <Field label="Cantidad">
-            <input type="number" min={1} {...register("quantity", { valueAsNumber: true })} />
+            <Input type="number" min={1} {...register("quantity", { valueAsNumber: true })} />
           </Field>
         </>
       ) : null}
 
       {values.channel === "PETALO" ? (
         <Field label="Zona">
-          <select {...register("zone")}>
-            <option value="ENTRADA">Entrada</option>
-            <option value="PASILLO_CENTRAL">Pasillo central</option>
-            <option value="CAJAS">Cajas</option>
-          </select>
+          <Select {...register("zone")}>
+            {PETALO_ZONES.map((zone) => (
+              <option key={zone} value={zone}>
+                {PETALO_ZONE_LABELS[zone]}
+              </option>
+            ))}
+          </Select>
         </Field>
       ) : null}
 
       {values.channel === "PARRILLERA" ? (
         <>
           <Field label="Niveles">
-            <input type="number" min={1} {...register("levels", { valueAsNumber: true })} />
+            <Input type="number" min={1} {...register("levels", { valueAsNumber: true })} />
           </Field>
           <Field label="Categoría">
-            <input {...register("category")} style={{ width: "100%" }} />
+            <Input {...register("category")} />
           </Field>
         </>
       ) : null}
@@ -306,20 +310,20 @@ export function CampaignFormView({
       {values.channel === "SMS" ? (
         <>
           <Field label="Segmento">
-            <input {...register("segment")} style={{ width: "100%" }} />
+            <Input {...register("segment")} />
           </Field>
           <Field label="Audiencia estimada">
-            <input type="number" min={0} {...register("estimatedAudience", { valueAsNumber: true })} />
+            <Input type="number" min={0} {...register("estimatedAudience", { valueAsNumber: true })} />
           </Field>
           <Field label="Plantilla de mensaje">
-            <textarea {...register("template")} style={{ width: "100%" }} rows={3} />
+            <Textarea {...register("template")} rows={3} />
           </Field>
-          <div style={{ display: "flex", gap: 12 }}>
+          <div className="flex gap-3">
             <Field label="Ventana de envío - desde">
-              <input type="time" {...register("sendWindowFrom")} />
+              <Input type="time" {...register("sendWindowFrom")} />
             </Field>
             <Field label="Ventana de envío - hasta">
-              <input type="time" {...register("sendWindowTo")} />
+              <Input type="time" {...register("sendWindowTo")} />
             </Field>
           </div>
         </>
@@ -328,42 +332,35 @@ export function CampaignFormView({
       {values.channel === "TIKTOK" ? (
         <>
           <Field label="Cuenta publicitaria">
-            <input {...register("adAccount")} style={{ width: "100%" }} />
+            <Input {...register("adAccount")} />
           </Field>
           <Field label="Objetivo">
-            <input {...register("objective")} style={{ width: "100%" }} />
+            <Input {...register("objective")} />
           </Field>
           <Field label="Creativos (separados por coma)">
-            <input {...register("creatives")} style={{ width: "100%" }} />
+            <Input {...register("creatives")} />
           </Field>
           <Field label="Presupuesto diario (USD)">
-            <input type="number" min={0} step="0.01" {...register("dailyBudgetUsd", { valueAsNumber: true })} />
+            <Input type="number" min={0} step="0.01" {...register("dailyBudgetUsd", { valueAsNumber: true })} />
           </Field>
         </>
       ) : null}
 
-      <div style={{ margin: "16px 0", padding: 12, background: "#f0f4ff", borderRadius: 6 }}>
+      <div className="my-4 rounded-control bg-gold-100 p-3 text-sm text-ink">
         Costo total estimado:{" "}
-        <strong>{estimatedCost !== null ? `$${estimatedCost.toFixed(2)}` : "— selecciona proveedor y medio"}</strong>
-        <p style={{ fontSize: 12, color: "#666", margin: "4px 0 0" }}>
+        <strong className="text-navy-900">
+          {estimatedCost !== null ? `$${estimatedCost.toFixed(2)}` : "— selecciona proveedor y medio"}
+        </strong>
+        <p className="mt-1 text-xs text-text-muted">
           Este valor es solo referencial; el backend recalcula y valida el costo real al guardar.
         </p>
       </div>
 
-      {error ? <p style={{ color: "#c0392b" }}>{error}</p> : null}
+      {error ? <ErrorText>{error}</ErrorText> : null}
 
-      <button type="submit" disabled={isSubmitting}>
+      <Button type="submit" variant="primary" disabled={isSubmitting}>
         {isSubmitting ? "Guardando..." : "Guardar"}
-      </button>
+      </Button>
     </form>
-  );
-}
-
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <label style={{ display: "block", marginBottom: 12, fontSize: 13 }}>
-      <div style={{ marginBottom: 4, color: "#444" }}>{label}</div>
-      {children}
-    </label>
   );
 }

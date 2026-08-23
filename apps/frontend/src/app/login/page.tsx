@@ -1,7 +1,7 @@
 "use client";
 
-import { useLogin } from "../../view-models/session/use-login";
-import { LoginView } from "../../views/auth/LoginView";
+import { useLogin } from "@/view-models/session/use-login";
+import { LoginView } from "@/views/auth/LoginView";
 
 export default function LoginPage() {
   const { isLoading, pendingAccess, error, actions } = useLogin();

@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui";
+
 interface PaginationProps {
   hasNextPage: boolean;
   hasPrevPage: boolean;
@@ -7,13 +9,13 @@ interface PaginationProps {
 
 export function Pagination({ hasNextPage, hasPrevPage, onNext, onPrev }: PaginationProps) {
   return (
-    <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-      <button onClick={onPrev} disabled={!hasPrevPage}>
+    <div className="mt-4 flex gap-2">
+      <Button variant="secondary" size="sm" onClick={onPrev} disabled={!hasPrevPage}>
         ← Anterior
-      </button>
-      <button onClick={onNext} disabled={!hasNextPage}>
+      </Button>
+      <Button variant="secondary" size="sm" onClick={onNext} disabled={!hasNextPage}>
         Siguiente →
-      </button>
+      </Button>
     </div>
   );
 }

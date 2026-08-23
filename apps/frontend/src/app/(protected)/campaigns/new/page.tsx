@@ -1,8 +1,8 @@
 "use client";
 
-import { useCampaignForm } from "../../../../view-models/campaigns/useCampaignForm";
-import { useReferenceData } from "../../../../view-models/campaigns/useReferenceData";
-import { CampaignFormView } from "../../../../views/campaigns/CampaignFormView";
+import { useCampaignForm } from "@/view-models/campaigns/useCampaignForm";
+import { useReferenceData } from "@/view-models/campaigns/useReferenceData";
+import { CampaignFormView } from "@/views/campaigns/CampaignFormView";
 
 export default function NewCampaignPage() {
   const { brands, products, suppliers, mediaCosts } = useReferenceData();

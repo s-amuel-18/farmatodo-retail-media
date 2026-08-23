@@ -3,6 +3,8 @@ import type { Campaign } from "@farmatodo-retail-media/types";
 import { StatusBadge } from "../shared/StatusBadge";
 import { FiltersBar, type FiltersBarValue } from "../shared/FiltersBar";
 import { Pagination } from "../shared/Pagination";
+import { Button, EmptyState, ErrorText, LoadingState, Table, TableBody, TableHead, TableRow, Td, Th } from "@/components/ui";
+import { CHANNEL_LABELS, EDITABLE_CAMPAIGN_STATUSES } from "@/lib/campaign-vocabulary";
 
 interface CampaignsInboxViewProps {
   campaigns: Campaign[];
@@ -19,8 +21,6 @@ interface CampaignsInboxViewProps {
   onSubmit: (campaignId: string) => void;
 }
 
-const EDITABLE_STATUSES = new Set(["DRAFT", "REJECTED"]);
-
 export function CampaignsInboxView({
   campaigns,
   isLoading,
@@ -32,59 +32,74 @@ export function CampaignsInboxView({
 }: CampaignsInboxViewProps) {
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
-        <h1 style={{ fontSize: 20 }}>Mis campañas</h1>
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-navy-900">Mis campañas</h1>
         <Link href="/campaigns/new">
-          <button>+ Nueva campaña</button>
+          <Button variant="primary">+ Nueva campaña</Button>
         </Link>
       </div>
 
       <FiltersBar value={filters} onChange={onFiltersChange} />
 
-      {error ? <p style={{ color: "#c0392b" }}>{error}</p> : null}
-      {isLoading ? <p>Cargando...</p> : null}
+      {error ? <ErrorText>{error}</ErrorText> : null}
+      {isLoading ? <LoadingState /> : null}
 
-      {!isLoading && campaigns.length === 0 ? <p>No hay campañas con estos filtros.</p> : null}
+      {!isLoading && campaigns.length === 0 ? (
+        <EmptyState message="No hay campañas con estos filtros." />
+      ) : null}
 
       {campaigns.length > 0 ? (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ textAlign: "left", borderBottom: "1px solid #e5e7eb" }}>
-              <th style={{ padding: 8 }}>Nombre</th>
-              <th style={{ padding: 8 }}>Canal</th>
-              <th style={{ padding: 8 }}>Costo total</th>
-              <th style={{ padding: 8 }}>Estado</th>
-              <th style={{ padding: 8 }}></th>
+        <div className="overflow-x-auto rounded-control border border-border bg-surface">
+        <Table>
+          <TableHead>
+            <tr>
+              <Th>Nombre</Th>
+              <Th>Canal</Th>
+              <Th>Costo total</Th>
+              <Th>Estado</Th>
+              <Th />
             </tr>
-          </thead>
-          <tbody>
+          </TableHead>
+          <TableBody>
             {campaigns.map((campaign) => (
-              <tr key={campaign.id} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                <td style={{ padding: 8 }}>
-                  <Link href={`/campaigns/${campaign.id}`}>{campaign.name}</Link>
+              <TableRow key={campaign.id}>
+                <Td>
+                  <Link href={`/campaigns/${campaign.id}`} className="font-medium text-brand-blue-700 hover:underline">
+                    {campaign.name}
+                  </Link>
                   {campaign.status === "REJECTED" && campaign.currentApprovalComment ? (
-                    <p style={{ color: "#c0392b", fontSize: 12, margin: "4px 0 0" }}>
+                    <p className="mt-1 text-xs text-danger-600">
                       Rechazada: {campaign.currentApprovalComment}
                     </p>
                   ) : null}
-                </td>
-                <td style={{ padding: 8 }}>{campaign.channel}</td>
-                <td style={{ padding: 8 }}>${campaign.totalCostUsd.toFixed(2)}</td>
-                <td style={{ padding: 8 }}>
+                </Td>
+                <Td>{CHANNEL_LABELS[campaign.channel]}</Td>
+                <Td>${campaign.totalCostUsd.toFixed(2)}</Td>
+                <Td>
                   <StatusBadge status={campaign.status} />
-                </td>
-                <td style={{ padding: 8, display: "flex", gap: 8 }}>
-                  {EDITABLE_STATUSES.has(campaign.status) ? (
-                    <>
-                      <Link href={`/campaigns/${campaign.id}/edit`}>Editar</Link>
-                      <button onClick={() => onSubmit(campaign.id)}>Enviar a aprobación</button>
-                    </>
+                </Td>
+                <Td>
+                  {EDITABLE_CAMPAIGN_STATUSES.has(campaign.status) ? (
+                    <div className="flex gap-3">
+                      <Link href={`/campaigns/${campaign.id}/edit`} className="text-sm text-brand-blue-700 hover:underline">
+                        Editar
+                      </Link>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onSubmit(campaign.id)}
+                        className="h-auto p-0 font-medium text-brand-blue-700 hover:bg-transparent hover:underline"
+                      >
+                        Enviar a aprobación
+                      </Button>
+                    </div>
                   ) : null}
-                </td>
-              </tr>
+                </Td>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
+        </div>
       ) : null}
 
       <Pagination {...pagination} />

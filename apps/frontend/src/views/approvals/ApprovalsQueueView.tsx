@@ -6,6 +6,21 @@ import type { Campaign } from "@farmatodo-retail-media/types";
 import { StatusBadge } from "../shared/StatusBadge";
 import { FiltersBar, type FiltersBarValue } from "../shared/FiltersBar";
 import { Pagination } from "../shared/Pagination";
+import {
+  Button,
+  EmptyState,
+  ErrorText,
+  LoadingState,
+  Modal,
+  Table,
+  TableBody,
+  TableHead,
+  TableRow,
+  Td,
+  Textarea,
+  Th,
+} from "@/components/ui";
+import { CHANNEL_LABELS } from "@/lib/campaign-vocabulary";
 
 interface ApprovalsQueueViewProps {
   campaigns: Campaign[];
@@ -37,88 +52,91 @@ export function ApprovalsQueueView({
 
   return (
     <div>
-      <h1 style={{ fontSize: 20, marginBottom: 16 }}>Bandeja de aprobación</h1>
+      <h1 className="mb-4 text-xl font-semibold text-navy-900">Bandeja de aprobación</h1>
 
       <FiltersBar value={filters} onChange={onFiltersChange} />
 
-      {error ? <p style={{ color: "#c0392b" }}>{error}</p> : null}
-      {isLoading ? <p>Cargando...</p> : null}
-      {!isLoading && campaigns.length === 0 ? <p>No hay campañas con estos filtros.</p> : null}
+      {error ? <ErrorText>{error}</ErrorText> : null}
+      {isLoading ? <LoadingState /> : null}
+      {!isLoading && campaigns.length === 0 ? (
+        <EmptyState message="No hay campañas con estos filtros." />
+      ) : null}
 
       {campaigns.length > 0 ? (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ textAlign: "left", borderBottom: "1px solid #e5e7eb" }}>
-              <th style={{ padding: 8 }}>Nombre</th>
-              <th style={{ padding: 8 }}>Canal</th>
-              <th style={{ padding: 8 }}>Costo total</th>
-              <th style={{ padding: 8 }}>Estado</th>
-              <th style={{ padding: 8 }}></th>
+        <div className="overflow-x-auto rounded-control border border-border bg-surface">
+        <Table>
+          <TableHead>
+            <tr>
+              <Th>Nombre</Th>
+              <Th>Canal</Th>
+              <Th>Costo total</Th>
+              <Th>Estado</Th>
+              <Th />
             </tr>
-          </thead>
-          <tbody>
+          </TableHead>
+          <TableBody>
             {campaigns.map((campaign) => (
-              <tr key={campaign.id} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                <td style={{ padding: 8 }}>
-                  <Link href={`/approvals/${campaign.id}`}>{campaign.name}</Link>
-                </td>
-                <td style={{ padding: 8 }}>{campaign.channel}</td>
-                <td style={{ padding: 8 }}>${campaign.totalCostUsd.toFixed(2)}</td>
-                <td style={{ padding: 8 }}>
+              <TableRow key={campaign.id}>
+                <Td>
+                  <Link href={`/approvals/${campaign.id}`} className="font-medium text-brand-blue-700 hover:underline">
+                    {campaign.name}
+                  </Link>
+                </Td>
+                <Td>{CHANNEL_LABELS[campaign.channel]}</Td>
+                <Td>${campaign.totalCostUsd.toFixed(2)}</Td>
+                <Td>
                   <StatusBadge status={campaign.status} />
-                </td>
-                <td style={{ padding: 8, display: "flex", gap: 8 }}>
+                </Td>
+                <Td>
                   {campaign.status === "PENDING_APPROVAL" ? (
-                    <>
-                      <button onClick={() => onApprove(campaign.id)}>Aprobar</button>
-                      <button onClick={() => setRejecting({ id: campaign.id, comment: "" })}>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="primary" onClick={() => onApprove(campaign.id)}>
+                        Aprobar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => setRejecting({ id: campaign.id, comment: "" })}
+                      >
                         Rechazar
-                      </button>
-                    </>
+                      </Button>
+                    </div>
                   ) : null}
-                </td>
-              </tr>
+                </Td>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
+        </div>
       ) : null}
 
       <Pagination {...pagination} />
 
       {rejecting ? (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.4)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <div style={{ background: "#fff", padding: 24, borderRadius: 8, width: 360 }}>
-            <h2 style={{ fontSize: 16, marginBottom: 8 }}>Motivo del rechazo</h2>
-            <textarea
-              value={rejecting.comment}
-              onChange={(e) => setRejecting({ ...rejecting, comment: e.target.value })}
-              rows={4}
-              style={{ width: "100%", marginBottom: 12 }}
-              placeholder="Este comentario es obligatorio y lo verá el analista"
-            />
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-              <button onClick={() => setRejecting(null)}>Cancelar</button>
-              <button
-                disabled={!rejecting.comment.trim()}
-                onClick={() => {
-                  onReject(rejecting.id, rejecting.comment.trim());
-                  setRejecting(null);
-                }}
-              >
-                Confirmar rechazo
-              </button>
-            </div>
+        <Modal title="Motivo del rechazo" onClose={() => setRejecting(null)}>
+          <Textarea
+            value={rejecting.comment}
+            onChange={(e) => setRejecting({ ...rejecting, comment: e.target.value })}
+            rows={4}
+            className="mb-3"
+            placeholder="Este comentario es obligatorio y lo verá el analista"
+          />
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setRejecting(null)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="danger"
+              disabled={!rejecting.comment.trim()}
+              onClick={() => {
+                onReject(rejecting.id, rejecting.comment.trim());
+                setRejecting(null);
+              }}
+            >
+              Confirmar rechazo
+            </Button>
           </div>
-        </div>
+        </Modal>
       ) : null}
     </div>
   );

@@ -1,34 +1,14 @@
 import type { CampaignStatus } from "@farmatodo-retail-media/types";
+import { Badge, type BadgeTone } from "@/components/ui";
+import { CAMPAIGN_STATUS_LABELS } from "@/lib/campaign-vocabulary";
 
-const LABELS: Record<CampaignStatus, string> = {
-  DRAFT: "Borrador",
-  PENDING_APPROVAL: "Pendiente",
-  APPROVED: "Aprobada",
-  REJECTED: "Rechazada",
-};
-
-const COLORS: Record<CampaignStatus, { bg: string; fg: string }> = {
-  DRAFT: { bg: "#e5e7eb", fg: "#374151" },
-  PENDING_APPROVAL: { bg: "#fef3c7", fg: "#92400e" },
-  APPROVED: { bg: "#d1fae5", fg: "#065f46" },
-  REJECTED: { bg: "#fee2e2", fg: "#991b1b" },
+const STATUS_TONES: Record<CampaignStatus, BadgeTone> = {
+  DRAFT: "draft",
+  PENDING_APPROVAL: "pending",
+  APPROVED: "approved",
+  REJECTED: "rejected",
 };
 
 export function StatusBadge({ status }: { status: CampaignStatus }) {
-  const { bg, fg } = COLORS[status];
-  return (
-    <span
-      style={{
-        background: bg,
-        color: fg,
-        borderRadius: 999,
-        padding: "2px 10px",
-        fontSize: 12,
-        fontWeight: 600,
-        whiteSpace: "nowrap",
-      }}
-    >
-      {LABELS[status]}
-    </span>
-  );
+  return <Badge tone={STATUS_TONES[status]}>{CAMPAIGN_STATUS_LABELS[status]}</Badge>;
 }

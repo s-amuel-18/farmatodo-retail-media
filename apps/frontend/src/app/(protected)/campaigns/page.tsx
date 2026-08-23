@@ -1,7 +1,7 @@
 "use client";
 
-import { useCampaignsInbox } from "../../../view-models/campaigns/useCampaignsInbox";
-import { CampaignsInboxView } from "../../../views/campaigns/CampaignsInboxView";
+import { useCampaignsInbox } from "@/view-models/campaigns/useCampaignsInbox";
+import { CampaignsInboxView } from "@/views/campaigns/CampaignsInboxView";
 
 export default function CampaignsInboxPage() {
   const { campaigns, isLoading, error, filters, setFilters, pagination, actions } =
