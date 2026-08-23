@@ -1,11 +1,19 @@
-import type { AuthenticatedUser, Campaign } from "@farmatodo-retail-media/types";
+import type { AuthenticatedUser, Campaign, HistoryEntry } from "@farmatodo-retail-media/types";
 import { CampaignNotFoundError, ForbiddenActionError } from "../../domain/errors";
 import type { CampaignRepository } from "../ports/campaign-repository.port";
+
+export interface CampaignWithHistory {
+  campaign: Campaign;
+  history: HistoryEntry[];
+}
 
 export class GetCampaignUseCase {
   constructor(private readonly campaignRepository: CampaignRepository) {}
 
-  async execute(input: { campaignId: string; actor: AuthenticatedUser }): Promise<Campaign> {
+  async execute(input: {
+    campaignId: string;
+    actor: AuthenticatedUser;
+  }): Promise<CampaignWithHistory> {
     const campaign = await this.campaignRepository.findById(input.campaignId);
     if (!campaign) throw new CampaignNotFoundError(input.campaignId);
 
@@ -14,6 +22,7 @@ export class GetCampaignUseCase {
       throw new ForbiddenActionError("VIEW", input.actor.role);
     }
 
-    return campaign;
+    const history = await this.campaignRepository.listHistory(input.campaignId);
+    return { campaign, history };
   }
 }

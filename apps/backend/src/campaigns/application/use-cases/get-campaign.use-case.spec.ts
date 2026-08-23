@@ -36,16 +36,17 @@ async function setup() {
 }
 
 describe("GetCampaignUseCase", () => {
-  it("lets the owner analyst view their own campaign", async () => {
+  it("lets the owner analyst view their own campaign, with its (empty) history", async () => {
     const { useCase, created } = await setup();
     const result = await useCase.execute({ campaignId: created.id, actor: owner });
-    expect(result.id).toBe(created.id);
+    expect(result.campaign.id).toBe(created.id);
+    expect(result.history).toEqual([]);
   });
 
   it("lets a manager view any campaign", async () => {
     const { useCase, created } = await setup();
     const result = await useCase.execute({ campaignId: created.id, actor: manager });
-    expect(result.id).toBe(created.id);
+    expect(result.campaign.id).toBe(created.id);
   });
 
   it("forbids a different analyst from viewing someone else's campaign by guessing its id", async () => {

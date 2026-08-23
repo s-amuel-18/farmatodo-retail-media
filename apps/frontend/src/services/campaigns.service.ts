@@ -1,10 +1,16 @@
 import type {
   Campaign,
   CampaignListFilters,
+  HistoryEntry,
   NewCampaignInput,
   Paginated,
 } from "@farmatodo-retail-media/types";
 import { apiClient } from "./api-client";
+
+export interface CampaignWithHistory {
+  campaign: Campaign;
+  history: HistoryEntry[];
+}
 
 function toQueryString(filters: CampaignListFilters): string {
   const params = new URLSearchParams();
@@ -26,8 +32,8 @@ export const campaignsService = {
     return apiClient.patch<Campaign>(`/campaigns/${id}`, data);
   },
 
-  get(id: string): Promise<Campaign> {
-    return apiClient.get<Campaign>(`/campaigns/${id}`);
+  get(id: string): Promise<CampaignWithHistory> {
+    return apiClient.get<CampaignWithHistory>(`/campaigns/${id}`);
   },
 
   list(filters: CampaignListFilters): Promise<Paginated<Campaign>> {

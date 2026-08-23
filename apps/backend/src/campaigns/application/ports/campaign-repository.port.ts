@@ -33,4 +33,5 @@ export interface CampaignRepository {
   replaceEditableFields(id: string, input: NewCampaignInput, totalCostUsd: number): Promise<Campaign>;
   transactionalUpdate(id: string, decide: Decide): Promise<Campaign>;
   list(filters: CampaignListFilters): Promise<Paginated<Campaign>>;
+  listHistory(campaignId: string): Promise<HistoryEntry[]>;
 }

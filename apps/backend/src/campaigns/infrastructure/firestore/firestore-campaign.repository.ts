@@ -3,6 +3,7 @@ import type * as admin from "firebase-admin";
 import type {
   Campaign,
   CampaignListFilters,
+  HistoryEntry,
   NewCampaignInput,
   Paginated,
 } from "@farmatodo-retail-media/types";
@@ -97,6 +98,16 @@ export class FirestoreCampaignRepository implements CampaignRepository {
     const nextCursor = items.length === pageSize ? items[items.length - 1]?.id ?? null : null;
 
     return { items, nextCursor };
+  }
+
+  async listHistory(campaignId: string): Promise<HistoryEntry[]> {
+    const snap = await this.collection()
+      .doc(campaignId)
+      .collection("history")
+      .orderBy("occurredAt", "asc")
+      .get();
+
+    return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as HistoryEntry);
   }
 }
 

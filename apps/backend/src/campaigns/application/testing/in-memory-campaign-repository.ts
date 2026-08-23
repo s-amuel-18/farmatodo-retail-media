@@ -59,4 +59,8 @@ export class InMemoryCampaignRepository implements CampaignRepository {
     });
     return { items, nextCursor: null };
   }
+
+  async listHistory(campaignId: string): Promise<HistoryEntry[]> {
+    return this.history.filter((entry) => entry.campaignId === campaignId);
+  }
 }
