@@ -215,6 +215,7 @@ export function useCampaignForm({ target, initialCampaign, products, mediaCosts 
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<CampaignFormValues>({
     defaultValues: toDefaultValues(initialCampaign),
@@ -227,6 +228,20 @@ export function useCampaignForm({ target, initialCampaign, products, mediaCosts 
   const values = watch();
   const filteredProducts = products.filter((p) => values.brandIds?.includes(p.brandId));
   const estimatedCost = estimateCost(values, mediaCosts);
+
+  function onBrandsChange(nextBrandIds: string[]) {
+    setValue("brandIds", nextBrandIds, { shouldDirty: true });
+    const allowedSkus = new Set(products.filter((p) => nextBrandIds.includes(p.brandId)).map((p) => p.sku));
+    setValue(
+      "productSkus",
+      values.productSkus.filter((sku) => allowedSkus.has(sku)),
+      { shouldDirty: true },
+    );
+  }
+
+  function onProductsChange(nextProductSkus: string[]) {
+    setValue("productSkus", nextProductSkus, { shouldDirty: true });
+  }
 
   const mutation = useMutation({
     mutationFn: (data: NewCampaignInput) =>
@@ -265,6 +280,8 @@ export function useCampaignForm({ target, initialCampaign, products, mediaCosts 
     onSubmit: handleSubmit(onValid, onInvalid),
     values,
     filteredProducts,
+    onBrandsChange,
+    onProductsChange,
     estimatedCost,
     isSubmitting: mutation.isPending,
     fieldErrors,
