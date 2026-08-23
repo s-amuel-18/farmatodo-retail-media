@@ -11,7 +11,7 @@ export default function EditCampaignPage() {
   const { id } = useParams<{ id: string }>();
   const { campaign, isLoading } = useCampaign(id);
   const { brands, products, suppliers, mediaCosts } = useReferenceData();
-  const { register, onSubmit, values, filteredProducts, estimatedCost, isSubmitting, error } =
+  const { register, errors, onSubmit, values, filteredProducts, estimatedCost, isSubmitting, error } =
     useCampaignForm({
       target: { mode: "edit", campaignId: id },
       initialCampaign: campaign,
@@ -26,6 +26,7 @@ export default function EditCampaignPage() {
     <CampaignFormView
       mode="edit"
       register={register}
+      errors={errors}
       values={values}
       onSubmit={onSubmit}
       brands={brands}

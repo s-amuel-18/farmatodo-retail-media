@@ -4,7 +4,7 @@ import { useApprovalsQueue } from "@/view-models/approvals/useApprovalsQueue";
 import { ApprovalsQueueView } from "@/views/approvals/ApprovalsQueueView";
 
 export default function ApprovalsQueuePage() {
-  const { campaigns, isLoading, error, filters, setFilters, pagination, actions } =
+  const { campaigns, isLoading, error, filters, setFilters, pagination, actions, decision, statusMessage } =
     useApprovalsQueue();
 
   return (
@@ -17,6 +17,8 @@ export default function ApprovalsQueuePage() {
       pagination={pagination}
       onApprove={actions.approve}
       onReject={actions.reject}
+      decisionError={decision.error}
+      statusMessage={statusMessage}
     />
   );
 }

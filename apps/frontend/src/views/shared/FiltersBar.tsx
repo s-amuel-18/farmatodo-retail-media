@@ -18,7 +18,8 @@ export function FiltersBar({ value, onChange }: FiltersBarProps) {
 
   return (
     <div className="mb-4 flex flex-wrap items-end gap-4 rounded-control border border-border bg-surface p-4">
-      <div className="flex flex-wrap gap-x-4 gap-y-2">
+      <fieldset className="flex flex-wrap gap-x-4 gap-y-2 border-0 p-0">
+        <legend className="sr-only">Filtrar por estado</legend>
         {CAMPAIGN_STATUSES.map((status) => (
           <label key={status} className="flex items-center gap-1.5 text-sm text-ink">
             <input
@@ -30,7 +31,7 @@ export function FiltersBar({ value, onChange }: FiltersBarProps) {
             {CAMPAIGN_STATUS_LABELS[status]}
           </label>
         ))}
-      </div>
+      </fieldset>
       <label className="text-sm text-text-muted">
         <span className="mb-1 block">Desde</span>
         <Input

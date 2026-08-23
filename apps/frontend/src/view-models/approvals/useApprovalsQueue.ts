@@ -12,6 +12,7 @@ const DEFAULT_FILTERS: FiltersBarValue = { status: ["PENDING_APPROVAL"], dateFro
 export function useApprovalsQueue() {
   const [filters, setFiltersState] = useState<FiltersBarValue>(DEFAULT_FILTERS);
   const [cursorStack, setCursorStack] = useState<string[]>([]);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const apiFilters: CampaignListFilters = useMemo(
@@ -35,13 +36,19 @@ export function useApprovalsQueue() {
 
   const approve = useMutation({
     mutationFn: (campaignId: string) => approvalsService.approve(campaignId),
-    onSuccess: invalidate,
+    onSuccess: () => {
+      invalidate();
+      setStatusMessage("Campaña aprobada.");
+    },
   });
 
   const reject = useMutation({
     mutationFn: (input: { campaignId: string; comment: string }) =>
       approvalsService.reject(input.campaignId, input.comment),
-    onSuccess: invalidate,
+    onSuccess: () => {
+      invalidate();
+      setStatusMessage("Campaña rechazada.");
+    },
   });
 
   return {
@@ -63,8 +70,18 @@ export function useApprovalsQueue() {
       onPrev: () => setCursorStack((stack) => stack.slice(0, -1)),
     },
     actions: {
-      approve: (campaignId: string) => approve.mutate(campaignId),
-      reject: (campaignId: string, comment: string) => reject.mutate({ campaignId, comment }),
+      approve: (campaignId: string) => approve.mutateAsync(campaignId),
+      reject: (campaignId: string, comment: string) => reject.mutateAsync({ campaignId, comment }),
     },
+    decision: {
+      isPending: approve.isPending || reject.isPending,
+      error:
+        approve.error instanceof Error
+          ? approve.error.message
+          : reject.error instanceof Error
+            ? reject.error.message
+            : null,
+    },
+    statusMessage,
   };
 }

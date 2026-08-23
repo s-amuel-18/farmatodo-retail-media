@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui";
 
 interface PaginationProps {
@@ -8,14 +9,35 @@ interface PaginationProps {
 }
 
 export function Pagination({ hasNextPage, hasPrevPage, onNext, onPrev }: PaginationProps) {
+  const [announcement, setAnnouncement] = useState("");
+
   return (
-    <div className="mt-4 flex gap-2">
-      <Button variant="secondary" size="sm" onClick={onPrev} disabled={!hasPrevPage}>
-        ← Anterior
+    <nav aria-label="Paginación" className="mt-4 flex items-center gap-2">
+      <Button
+        variant="secondary"
+        size="sm"
+        onClick={() => {
+          onPrev();
+          setAnnouncement("Mostrando página anterior.");
+        }}
+        disabled={!hasPrevPage}
+      >
+        <span aria-hidden="true">←</span> Anterior
       </Button>
-      <Button variant="secondary" size="sm" onClick={onNext} disabled={!hasNextPage}>
-        Siguiente →
+      <Button
+        variant="secondary"
+        size="sm"
+        onClick={() => {
+          onNext();
+          setAnnouncement("Mostrando página siguiente.");
+        }}
+        disabled={!hasNextPage}
+      >
+        Siguiente <span aria-hidden="true">→</span>
       </Button>
-    </div>
+      <span role="status" aria-live="polite" className="sr-only">
+        {announcement}
+      </span>
+    </nav>
   );
 }

@@ -1,12 +1,16 @@
 import type { TdHTMLAttributes, ThHTMLAttributes, HTMLAttributes } from "react";
 import clsx from "clsx";
 
-export function Table({ className, ...props }: HTMLAttributes<HTMLTableElement>) {
+interface TableProps extends HTMLAttributes<HTMLTableElement> {
+  caption?: string;
+}
+
+export function Table({ className, caption, children, ...props }: TableProps) {
   return (
-    <table
-      className={clsx("w-full border-collapse text-sm text-ink", className)}
-      {...props}
-    />
+    <table className={clsx("w-full border-collapse text-sm text-ink", className)} {...props}>
+      {caption ? <caption className="sr-only">{caption}</caption> : null}
+      {children}
+    </table>
   );
 }
 
@@ -22,9 +26,10 @@ export function TableRow({ className, ...props }: HTMLAttributes<HTMLTableRowEle
   return <tr className={clsx("border-b border-border last:border-0 hover:bg-canvas", className)} {...props} />;
 }
 
-export function Th({ className, ...props }: ThHTMLAttributes<HTMLTableCellElement>) {
+export function Th({ className, scope = "col", ...props }: ThHTMLAttributes<HTMLTableCellElement>) {
   return (
     <th
+      scope={scope}
       className={clsx("px-3 py-2 text-xs font-semibold uppercase tracking-wide text-text-muted", className)}
       {...props}
     />

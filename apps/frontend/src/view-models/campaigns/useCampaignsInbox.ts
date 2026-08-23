@@ -11,6 +11,7 @@ const EMPTY_FILTERS: FiltersBarValue = { status: [], dateFrom: "", dateTo: "" };
 export function useCampaignsInbox() {
   const [filters, setFiltersState] = useState<FiltersBarValue>(EMPTY_FILTERS);
   const [cursorStack, setCursorStack] = useState<string[]>([]);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const apiFilters: CampaignListFilters = useMemo(
@@ -30,7 +31,10 @@ export function useCampaignsInbox() {
 
   const submit = useMutation({
     mutationFn: (campaignId: string) => campaignsService.submit(campaignId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["campaigns", "inbox"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["campaigns", "inbox"] });
+      setStatusMessage("Campaña enviada a aprobación.");
+    },
   });
 
   return {
@@ -52,8 +56,10 @@ export function useCampaignsInbox() {
       onPrev: () => setCursorStack((stack) => stack.slice(0, -1)),
     },
     actions: {
-      submit: (campaignId: string) => submit.mutate(campaignId),
+      submit: (campaignId: string) => submit.mutateAsync(campaignId),
       isSubmitting: submit.isPending,
     },
+    submitError: submit.error instanceof Error ? submit.error.message : null,
+    statusMessage,
   };
 }

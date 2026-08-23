@@ -1,7 +1,7 @@
 "use client";
 
 import type { BaseSyntheticEvent } from "react";
-import type { UseFormRegister } from "react-hook-form";
+import type { FieldErrors, UseFormRegister } from "react-hook-form";
 import Link from "next/link";
 import type { Brand, Product, Supplier } from "@farmatodo-retail-media/types";
 import type { CampaignFormValues } from "../../view-models/campaigns/useCampaignForm";
@@ -11,6 +11,7 @@ import { CHANNEL_LABELS, CHANNEL_TYPES, PETALO_ZONES, PETALO_ZONE_LABELS } from 
 interface CampaignFormViewProps {
   mode: "create" | "edit";
   register: UseFormRegister<CampaignFormValues>;
+  errors: FieldErrors<CampaignFormValues>;
   values: CampaignFormValues;
   onSubmit: (event?: BaseSyntheticEvent) => void;
   brands: Brand[];
@@ -22,9 +23,12 @@ interface CampaignFormViewProps {
   backHref: string;
 }
 
+const REQUIRED_MESSAGE = "Este campo es obligatorio";
+
 export function CampaignFormView({
   mode,
   register,
+  errors,
   values,
   onSubmit,
   brands,
@@ -38,7 +42,7 @@ export function CampaignFormView({
   const channel = values.channel;
 
   return (
-    <form onSubmit={onSubmit} className="max-w-2xl">
+    <form onSubmit={onSubmit} className="max-w-2xl" noValidate>
       <Link href={backHref} className="mb-3 inline-block text-sm text-brand-blue-700 hover:underline">
         ← Volver
       </Link>
@@ -46,11 +50,11 @@ export function CampaignFormView({
         {mode === "create" ? "Nueva campaña" : "Editar campaña"}
       </h1>
 
-      <Field label="Nombre">
-        <Input {...register("name", { required: true })} />
+      <Field label="Nombre" required error={errors.name?.message}>
+        <Input {...register("name", { required: REQUIRED_MESSAGE })} />
       </Field>
 
-      <Field label="Marca(s)">
+      <Field label="Marca(s)" hint="Mantén presionado Ctrl (Cmd en Mac) para elegir varias.">
         <Select multiple {...register("brandIds")} className="h-20">
           {brands.map((b) => (
             <option key={b.id} value={b.id}>
@@ -60,7 +64,7 @@ export function CampaignFormView({
         </Select>
       </Field>
 
-      <Field label="Producto(s) (SKU)">
+      <Field label="Producto(s) (SKU)" hint="Mantén presionado Ctrl (Cmd en Mac) para elegir varios.">
         <Select multiple {...register("productSkus")} className="h-20">
           {filteredProducts.map((p) => (
             <option key={p.sku} value={p.sku}>
@@ -70,8 +74,8 @@ export function CampaignFormView({
         </Select>
       </Field>
 
-      <Field label="Proveedor">
-        <Select {...register("supplierId", { required: true })}>
+      <Field label="Proveedor" required error={errors.supplierId?.message}>
+        <Select {...register("supplierId", { required: REQUIRED_MESSAGE })}>
           <option value="">Selecciona...</option>
           {suppliers.map((s) => (
             <option key={s.id} value={s.id}>
@@ -82,11 +86,11 @@ export function CampaignFormView({
       </Field>
 
       <div className="flex gap-3">
-        <Field label="Fecha inicio">
-          <Input type="date" {...register("startDate", { required: true })} />
+        <Field label="Fecha inicio" required error={errors.startDate?.message}>
+          <Input type="date" {...register("startDate", { required: REQUIRED_MESSAGE })} />
         </Field>
-        <Field label="Fecha fin">
-          <Input type="date" {...register("endDate", { required: true })} />
+        <Field label="Fecha fin" required error={errors.endDate?.message}>
+          <Input type="date" {...register("endDate", { required: REQUIRED_MESSAGE })} />
         </Field>
       </div>
 
