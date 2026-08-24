@@ -4,6 +4,7 @@ export { Badge } from "./Badge";
 export type { BadgeTone } from "./Badge";
 export { Card } from "./Card";
 export { Field } from "./Field";
+export { Section } from "./Section";
 export { Input } from "./Input";
 export { Select } from "./Select";
 export { Textarea } from "./Textarea";

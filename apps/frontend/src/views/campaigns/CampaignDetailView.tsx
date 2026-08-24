@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import type { ReactNode } from "react";
 import Link from "next/link";
 import type { Campaign, HistoryEntry } from "@farmatodo-retail-media/types";
 import { StatusBadge } from "../shared/StatusBadge";
-import { Button, ErrorText, Field, LoadingState, Modal, Textarea } from "@/components/ui";
+import { Button, ErrorText, Field, LoadingState, Modal, Section, Textarea } from "@/components/ui";
 import { CHANNEL_LABELS, HISTORY_ACTION_LABELS, PETALO_ZONE_LABELS } from "@/lib/campaign-vocabulary";
 
 function channelDetails(campaign: Campaign): Array<[string, string]> {
@@ -217,15 +216,6 @@ export function CampaignDetailView({
           </div>
         </Modal>
       ) : null}
-    </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="mb-5">
-      <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">{title}</h2>
-      {children}
     </div>
   );
 }

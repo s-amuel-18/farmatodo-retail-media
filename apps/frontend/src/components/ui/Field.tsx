@@ -1,15 +1,18 @@
 import { cloneElement, isValidElement, useId } from "react";
 import type { ReactElement, ReactNode } from "react";
+import clsx from "clsx";
 
 interface FieldProps {
   label: string;
   hint?: string | undefined;
   error?: string | undefined;
   required?: boolean;
+  /** Extra classes on the field's wrapper, e.g. `sm:col-span-2` inside a grid of fields. */
+  className?: string;
   children: ReactNode;
 }
 
-export function Field({ label, hint, error, required, children }: FieldProps) {
+export function Field({ label, hint, error, required, className, children }: FieldProps) {
   const generatedId = useId();
   const controlId = (isValidElement(children) && (children as ReactElement<{ id?: string }>).props.id) || generatedId;
   const hintId = hint ? `${generatedId}-hint` : undefined;
@@ -27,7 +30,7 @@ export function Field({ label, hint, error, required, children }: FieldProps) {
     : children;
 
   return (
-    <div className="mb-3 block text-sm">
+    <div className={clsx("mb-3 block text-sm", className)}>
       <label htmlFor={controlId} className="mb-1 block text-text-muted">
         {label}
         {required ? (
