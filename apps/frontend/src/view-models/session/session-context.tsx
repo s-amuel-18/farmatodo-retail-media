@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { authService, type SessionUser } from "../../services/auth.service";
 
 interface SessionContextValue {
@@ -34,6 +35,7 @@ function syncSessionCookies(user: SessionUser | null): void {
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     return authService.onSessionChanged((nextUser) => {
@@ -52,6 +54,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       },
       signOut: async () => {
         await authService.signOut();
+        // Evita que datos de campañas/aprobaciones ya cacheados queden visibles
+        // en memoria tras cerrar sesión.
+        queryClient.clear();
       },
     },
   };
