@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { Campaign, PetaloCampaign } from "@farmatodo-retail-media/types";
+import type { Campaign, PetaloCampaign, Supplier } from "@farmatodo-retail-media/types";
 import { ApprovalsQueueView } from "./ApprovalsQueueView";
 import type { FiltersBarValue } from "../../view-models/shared/filters";
 
@@ -14,7 +14,9 @@ function makePetaloCampaign(overrides: Partial<PetaloCampaign> = {}): PetaloCamp
     supplierId: "supplier-1",
     startDate: "2026-01-01",
     endDate: "2026-01-31",
+    campaignDate: "2026-01-01",
     createdAt: "2025-12-15T00:00:00.000Z",
+    updatedAt: "2025-12-15T00:00:00.000Z",
     createdBy: "analyst@example.com",
     status: "PENDING_APPROVAL",
     totalCostUsd: 1234.5,
@@ -45,6 +47,7 @@ type ApprovalsQueueViewProps = ComponentProps<typeof ApprovalsQueueView>;
 function baseProps(overrides: Partial<ApprovalsQueueViewProps> = {}): ApprovalsQueueViewProps {
   return {
     campaigns: [],
+    suppliers: [] as Supplier[],
     isLoading: false,
     error: null,
     filters: baseFilters(),

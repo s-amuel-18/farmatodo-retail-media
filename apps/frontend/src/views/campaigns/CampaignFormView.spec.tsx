@@ -12,6 +12,7 @@ const EMPTY_DEFAULTS: CampaignFormValues = {
   supplierId: "",
   startDate: "",
   endDate: "",
+  campaignDate: "",
   channel: "PETALO",
   stores: "",
   quantity: 1,
@@ -112,8 +113,8 @@ describe("CampaignFormView", () => {
 
     expect(onValidSubmit).not.toHaveBeenCalled();
     const requiredMessages = await screen.findAllByText("Este campo es obligatorio");
-    // name, supplierId, startDate, endDate are all `register(..., { required })`
-    expect(requiredMessages.length).toBe(4);
+    // name, supplierId, startDate, endDate, campaignDate are all `register(..., { required })`
+    expect(requiredMessages.length).toBe(5);
   });
 
   it("calls onValidSubmit with the form values when required fields are filled", async () => {
@@ -123,7 +124,13 @@ describe("CampaignFormView", () => {
       <Harness
         onValidSubmit={onValidSubmit}
         suppliers={[{ id: "sup-1", name: "Proveedor Uno" }]}
-        defaultValues={{ name: "Mi campaña", supplierId: "sup-1", startDate: "2026-01-01", endDate: "2026-01-31" }}
+        defaultValues={{
+          name: "Mi campaña",
+          supplierId: "sup-1",
+          startDate: "2026-01-01",
+          endDate: "2026-01-31",
+          campaignDate: "2026-01-01",
+        }}
       />,
     );
 
@@ -135,6 +142,7 @@ describe("CampaignFormView", () => {
       supplierId: "sup-1",
       startDate: "2026-01-01",
       endDate: "2026-01-31",
+      campaignDate: "2026-01-01",
     });
   });
 

@@ -20,6 +20,7 @@ const FORM_VALUES: CampaignFormValues = {
   supplierId: "",
   startDate: "",
   endDate: "",
+  campaignDate: "",
   channel: "PETALO",
   stores: "",
   quantity: 1,

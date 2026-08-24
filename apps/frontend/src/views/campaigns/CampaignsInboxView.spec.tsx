@@ -1,6 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { Campaign, PetaloCampaign } from "@farmatodo-retail-media/types";
+import type { Campaign, PetaloCampaign, Supplier } from "@farmatodo-retail-media/types";
 import { CampaignsInboxView } from "./CampaignsInboxView";
 
 function makeCampaign(overrides: Partial<PetaloCampaign> = {}): PetaloCampaign {
@@ -12,7 +12,9 @@ function makeCampaign(overrides: Partial<PetaloCampaign> = {}): PetaloCampaign {
     supplierId: "supplier-1",
     startDate: "2026-01-01",
     endDate: "2026-01-31",
+    campaignDate: "2026-01-01",
     createdAt: "2026-01-01T00:00:00.000Z",
+    updatedAt: "2026-01-01T00:00:00.000Z",
     createdBy: "user-1",
     status: "DRAFT",
     totalCostUsd: 123.456,
@@ -33,6 +35,7 @@ const noopPagination = {
 
 const baseProps = {
   campaigns: [] as Campaign[],
+  suppliers: [] as Supplier[],
   isLoading: false,
   error: null as string | null,
   filters: { status: [], dateFrom: "", dateTo: "" },
