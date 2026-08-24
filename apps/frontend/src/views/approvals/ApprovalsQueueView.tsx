@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import type { Campaign } from "@farmatodo-retail-media/types";
+import type { Campaign, Supplier } from "@farmatodo-retail-media/types";
 import { StatusBadge } from "../shared/StatusBadge";
 import { FiltersBar } from "../shared/FiltersBar";
 import type { FiltersBarValue } from "../../view-models/shared/filters";
@@ -26,6 +26,7 @@ import { CHANNEL_LABELS } from "@/lib/campaign-vocabulary";
 
 interface ApprovalsQueueViewProps {
   campaigns: Campaign[];
+  suppliers: Supplier[];
   isLoading: boolean;
   error: string | null;
   filters: FiltersBarValue;
@@ -45,6 +46,7 @@ interface ApprovalsQueueViewProps {
 
 export function ApprovalsQueueView({
   campaigns,
+  suppliers,
   isLoading,
   error,
   filters,
@@ -84,6 +86,7 @@ export function ApprovalsQueueView({
             <tr>
               <Th>Nombre</Th>
               <Th>Canal</Th>
+              <Th>Proveedor</Th>
               <Th>Costo total</Th>
               <Th>Estado</Th>
               <Th>
@@ -100,6 +103,7 @@ export function ApprovalsQueueView({
                   </Link>
                 </Td>
                 <Td>{CHANNEL_LABELS[campaign.channel]}</Td>
+                <Td>{suppliers.find((s) => s.id === campaign.supplierId)?.name ?? campaign.supplierId}</Td>
                 <Td>${campaign.totalCostUsd.toFixed(2)}</Td>
                 <Td>
                   <StatusBadge status={campaign.status} />

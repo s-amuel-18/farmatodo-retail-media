@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Campaign } from "@farmatodo-retail-media/types";
+import type { Campaign, Supplier } from "@farmatodo-retail-media/types";
 import { StatusBadge } from "../shared/StatusBadge";
 import { FiltersBar } from "../shared/FiltersBar";
 import type { FiltersBarValue } from "../../view-models/shared/filters";
@@ -21,6 +21,7 @@ import { CHANNEL_LABELS, EDITABLE_CAMPAIGN_STATUSES } from "@/lib/campaign-vocab
 
 interface CampaignsInboxViewProps {
   campaigns: Campaign[];
+  suppliers: Supplier[];
   isLoading: boolean;
   error: string | null;
   filters: FiltersBarValue;
@@ -39,6 +40,7 @@ interface CampaignsInboxViewProps {
 
 export function CampaignsInboxView({
   campaigns,
+  suppliers,
   isLoading,
   error,
   filters,
@@ -79,8 +81,10 @@ export function CampaignsInboxView({
             <tr>
               <Th>Nombre</Th>
               <Th>Canal</Th>
+              <Th>Proveedor</Th>
               <Th>Costo total</Th>
               <Th>Estado</Th>
+              <Th>Actualizada</Th>
               <Th>
                 <span className="sr-only">Acciones</span>
               </Th>
@@ -100,10 +104,12 @@ export function CampaignsInboxView({
                   ) : null}
                 </Td>
                 <Td>{CHANNEL_LABELS[campaign.channel]}</Td>
+                <Td>{suppliers.find((s) => s.id === campaign.supplierId)?.name ?? campaign.supplierId}</Td>
                 <Td>${campaign.totalCostUsd.toFixed(2)}</Td>
                 <Td>
                   <StatusBadge status={campaign.status} />
                 </Td>
+                <Td>{new Date(campaign.updatedAt).toLocaleDateString()}</Td>
                 <Td>
                   {EDITABLE_CAMPAIGN_STATUSES.has(campaign.status) ? (
                     <div className="flex gap-3">

@@ -13,6 +13,7 @@ const commonFields = {
   supplierId: z.string().min(1, "Selecciona un proveedor"),
   startDate: z.string().min(1, "La fecha de inicio es obligatoria"),
   endDate: z.string().min(1, "La fecha de fin es obligatoria"),
+  campaignDate: z.string().min(1, "La fecha de la campaña es obligatoria"),
 };
 
 const petaloCampaignSchema = z.object({

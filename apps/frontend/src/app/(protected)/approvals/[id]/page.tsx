@@ -11,7 +11,7 @@ export default function ApprovalDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { campaign, history, isLoading, error } = useCampaign(id);
   const { onApprove, onReject, isDeciding, decisionError, statusMessage } = useApprovalDecision(id);
-  const { suppliers, brands } = useReferenceData();
+  const { suppliers, brands, mediaCosts } = useReferenceData();
 
   if (isLoading) return <LoadingState />;
   if (error) return <ErrorText>{error}</ErrorText>;
@@ -26,6 +26,7 @@ export default function ApprovalDetailPage() {
     <CampaignDetailView
       campaign={campaign}
       history={history}
+      mediaCosts={mediaCosts}
       isLoading={false}
       error={null}
       backHref="/approvals"

@@ -19,10 +19,12 @@ export class InMemoryCampaignRepository implements CampaignRepository {
   }
 
   async create(draft: CampaignDraft): Promise<Campaign> {
+    const now = new Date().toISOString();
     const campaign = {
       ...draft,
       id: `campaign-${nextId++}`,
-      createdAt: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
       status: "DRAFT",
     } as Campaign;
     this.campaigns.set(campaign.id, campaign);
@@ -36,7 +38,12 @@ export class InMemoryCampaignRepository implements CampaignRepository {
   ): Promise<Campaign> {
     const current = this.campaigns.get(id);
     if (!current) throw new CampaignNotFoundError(id);
-    const updated = { ...current, ...input, totalCostUsd } as Campaign;
+    const updated = {
+      ...current,
+      ...input,
+      totalCostUsd,
+      updatedAt: new Date().toISOString(),
+    } as Campaign;
     this.campaigns.set(id, updated);
     return updated;
   }

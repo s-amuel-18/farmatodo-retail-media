@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
-import type { Campaign, HistoryEntry } from "@farmatodo-retail-media/types";
+import type { Campaign, HistoryEntry, MediaCost } from "@farmatodo-retail-media/types";
 import { StatusBadge } from "../shared/StatusBadge";
 import { Button, ErrorText, Field, LoadingState, Modal, Textarea } from "@/components/ui";
 import { CHANNEL_LABELS, HISTORY_ACTION_LABELS, PETALO_ZONE_LABELS } from "@/lib/campaign-vocabulary";
@@ -40,9 +40,30 @@ function channelDetails(campaign: Campaign): Array<[string, string]> {
   }
 }
 
+/**
+ * "Desglose de costos por medio": each campaign has a single channel, so the
+ * breakdown is the one media-cost line (unit cost x quantity, or a flat fee
+ * for SMS/TIKTOK) that the backend used to derive `totalCostUsd`.
+ */
+function costBreakdown(campaign: Campaign, mediaCosts: MediaCost[]): Array<[string, string]> {
+  const mediaCost = mediaCosts.find(
+    (m) => m.supplierId === campaign.supplierId && m.channel === campaign.channel,
+  );
+  if (!mediaCost) return [["Costo total", `$${campaign.totalCostUsd.toFixed(2)}`]];
+
+  const isUnitBased = campaign.channel === "PETALO" || campaign.channel === "PARRILLERA";
+  const rows: Array<[string, string]> = [
+    ["Costo unitario (proveedor x medio)", `$${mediaCost.unitCostUsd.toFixed(2)}`],
+  ];
+  if (isUnitBased) rows.push(["Cantidad contratada", String(campaign.quantity)]);
+  rows.push(["Costo total", `$${campaign.totalCostUsd.toFixed(2)}`]);
+  return rows;
+}
+
 interface CampaignDetailViewProps {
   campaign: Campaign;
   history: HistoryEntry[];
+  mediaCosts: MediaCost[];
   isLoading: boolean;
   error: string | null;
   backHref: string;
@@ -60,6 +81,7 @@ interface CampaignDetailViewProps {
 export function CampaignDetailView({
   campaign,
   history,
+  mediaCosts,
   isLoading,
   error,
   backHref,
@@ -109,13 +131,19 @@ export function CampaignDetailView({
         <Row label="Proveedor" value={supplierLabel} />
         <Row label="Marcas" value={brandLabels} />
         <Row label="Productos (SKU)" value={campaign.productSkus.join(", ")} />
+        <Row label="Fecha de la campaña" value={campaign.campaignDate} />
         <Row label="Fecha inicio" value={campaign.startDate} />
         <Row label="Fecha fin" value={campaign.endDate} />
-        <Row label="Costo total" value={`$${campaign.totalCostUsd.toFixed(2)}`} />
       </Section>
 
       <Section title="Detalles del canal">
         {channelDetails(campaign).map(([label, value]) => (
+          <Row key={label} label={label} value={value} />
+        ))}
+      </Section>
+
+      <Section title="Desglose de costos">
+        {costBreakdown(campaign, mediaCosts).map(([label, value]) => (
           <Row key={label} label={label} value={value} />
         ))}
       </Section>

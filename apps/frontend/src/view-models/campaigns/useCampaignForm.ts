@@ -22,6 +22,7 @@ export interface CampaignFormValues {
   supplierId: string;
   startDate: string;
   endDate: string;
+  campaignDate: string;
   channel: ChannelType;
   stores: string;
   quantity: number;
@@ -39,6 +40,10 @@ export interface CampaignFormValues {
   dailyBudgetUsd: number;
 }
 
+function today(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
 const EMPTY_VALUES: CampaignFormValues = {
   name: "",
   brandIds: [],
@@ -46,6 +51,7 @@ const EMPTY_VALUES: CampaignFormValues = {
   supplierId: "",
   startDate: "",
   endDate: "",
+  campaignDate: "",
   channel: "PETALO",
   stores: "",
   quantity: 1,
@@ -64,7 +70,7 @@ const EMPTY_VALUES: CampaignFormValues = {
 };
 
 function toDefaultValues(campaign: Campaign | null): CampaignFormValues {
-  if (!campaign) return EMPTY_VALUES;
+  if (!campaign) return { ...EMPTY_VALUES, campaignDate: today() };
 
   const base = {
     ...EMPTY_VALUES,
@@ -74,6 +80,7 @@ function toDefaultValues(campaign: Campaign | null): CampaignFormValues {
     supplierId: campaign.supplierId,
     startDate: campaign.startDate,
     endDate: campaign.endDate,
+    campaignDate: campaign.campaignDate,
     channel: campaign.channel,
   };
 
@@ -123,6 +130,7 @@ function toPayload(values: CampaignFormValues): NewCampaignInput {
     supplierId: values.supplierId,
     startDate: values.startDate,
     endDate: values.endDate,
+    campaignDate: values.campaignDate,
   };
 
   switch (values.channel) {

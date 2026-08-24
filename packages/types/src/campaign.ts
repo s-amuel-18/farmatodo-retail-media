@@ -37,7 +37,14 @@ export interface CampaignBase {
   supplierId: string;
   startDate: string;
   endDate: string;
+  /**
+   * "Fecha de registro de la campaña" captured by the analyst on the form —
+   * distinct from `createdAt` (the immutable Firestore write timestamp) so it
+   * can be used to sort/filter the inbox without depending on infra internals.
+   */
+  campaignDate: string;
   createdAt: string;
+  updatedAt: string;
   createdBy: string;
   status: CampaignStatus;
   totalCostUsd: number;
@@ -84,12 +91,14 @@ export type Campaign =
 /**
  * Shape used both by the create/edit form (frontend) and the create/update
  * use cases (backend) — server-assigned fields (id, status, totalCostUsd,
- * createdBy, createdAt, currentApprovalComment) are never part of client input.
+ * createdBy, createdAt, updatedAt, currentApprovalComment) are never part of
+ * client input. `campaignDate` IS part of client input — the analyst sets it.
  */
 export type NewCampaignInput = DistributiveOmit<
   Campaign,
   | "id"
   | "createdAt"
+  | "updatedAt"
   | "status"
   | "totalCostUsd"
   | "createdBy"

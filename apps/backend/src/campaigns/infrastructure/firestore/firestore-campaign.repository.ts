@@ -30,11 +30,13 @@ export class FirestoreCampaignRepository implements CampaignRepository {
 
   async create(draft: CampaignDraft): Promise<Campaign> {
     const ref = this.collection().doc();
+    const now = new Date().toISOString();
     const campaign = {
       ...draft,
       id: ref.id,
       status: "DRAFT",
-      createdAt: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
     } as Campaign;
 
     await ref.set(campaignToDoc(campaign));
@@ -51,7 +53,12 @@ export class FirestoreCampaignRepository implements CampaignRepository {
     if (!snap.exists) throw new CampaignNotFoundError(id);
 
     const current = docToCampaign(snap.id, snap.data() as admin.firestore.DocumentData);
-    const updated = { ...current, ...input, totalCostUsd } as Campaign;
+    const updated = {
+      ...current,
+      ...input,
+      totalCostUsd,
+      updatedAt: new Date().toISOString(),
+    } as Campaign;
 
     await ref.set(campaignToDoc(updated));
     return updated;

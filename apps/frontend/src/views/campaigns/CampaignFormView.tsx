@@ -95,6 +95,15 @@ export function CampaignFormView({
         </Select>
       </Field>
 
+      <Field
+        label="Fecha de la campaña"
+        required
+        hint="Fecha de registro de la campaña, usada para ordenar y filtrar el listado."
+        error={errors.campaignDate?.message ?? fieldErrors.campaignDate}
+      >
+        <Input type="date" {...register("campaignDate", { required: REQUIRED_MESSAGE })} />
+      </Field>
+
       <div className="flex gap-3">
         <Field label="Fecha inicio" required error={errors.startDate?.message ?? fieldErrors.startDate}>
           <Input type="date" {...register("startDate", { required: REQUIRED_MESSAGE })} />
