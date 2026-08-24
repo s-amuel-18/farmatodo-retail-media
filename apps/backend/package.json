@@ -9,6 +9,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "seed": "ts-node scripts/seed.ts",
+    "reset": "ts-node scripts/reset.ts",
     "set-claim": "ts-node scripts/set-role-claim.ts"
   },
   "dependencies": {
