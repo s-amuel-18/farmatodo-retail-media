@@ -99,6 +99,15 @@ export function CampaignFormView({
           </Field>
 
           <Field
+            label="Fecha de la campaña"
+            required
+            hint="Fecha de registro de la campaña, usada para ordenar y filtrar el listado."
+            error={errors.campaignDate?.message ?? fieldErrors.campaignDate}
+          >
+            <Input type="date" {...register("campaignDate", { required: REQUIRED_MESSAGE })} />
+          </Field>
+
+          <Field
             label="Medio de exhibición"
             hint={mode === "edit" ? "El canal no se puede cambiar una vez creada la campaña." : undefined}
           >

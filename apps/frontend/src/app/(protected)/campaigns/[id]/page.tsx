@@ -9,7 +9,7 @@ import { ErrorText, LoadingState } from "@/components/ui";
 export default function CampaignDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { campaign, history, isLoading, error } = useCampaign(id);
-  const { suppliers, brands } = useReferenceData();
+  const { suppliers, brands, mediaCosts } = useReferenceData();
 
   if (isLoading) return <LoadingState />;
   if (error) return <ErrorText>{error}</ErrorText>;
@@ -24,6 +24,7 @@ export default function CampaignDetailPage() {
     <CampaignDetailView
       campaign={campaign}
       history={history}
+      mediaCosts={mediaCosts}
       isLoading={false}
       error={null}
       backHref="/campaigns"

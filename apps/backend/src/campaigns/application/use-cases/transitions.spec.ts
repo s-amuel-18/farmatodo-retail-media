@@ -17,6 +17,7 @@ const tiktokInput: NewCampaignInput = {
   supplierId: "supplier-1",
   startDate: "2026-09-01",
   endDate: "2026-09-15",
+  campaignDate: "2026-08-20",
   channel: "TIKTOK",
   adAccount: "ftd-ads-1",
   objective: "TRAFFIC",

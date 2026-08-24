@@ -16,6 +16,7 @@ const baseInput: NewCampaignInput = {
   supplierId: "supplier-1",
   startDate: "2026-09-01",
   endDate: "2026-09-30",
+  campaignDate: "2026-08-20",
   channel: "SMS",
   segment: "clientes-frecuentes",
   estimatedAudience: 10000,

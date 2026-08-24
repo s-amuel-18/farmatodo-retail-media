@@ -13,7 +13,7 @@ export function decideTransition(action: CampaignAction, actor: AuthenticatedUse
     if (!result.ok) throw result.error;
 
     return {
-      campaign: result.campaign,
+      campaign: { ...result.campaign, updatedAt: new Date().toISOString() },
       historyEntry: {
         campaignId: current.id,
         action: result.historyAction,
