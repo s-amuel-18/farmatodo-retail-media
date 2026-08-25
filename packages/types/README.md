@@ -14,20 +14,32 @@ Ver también el [README de la raíz](../../README.md) para la visión general de
 - Declarado como dependencia en `apps/backend/package.json` y `apps/frontend/package.json` con el
   protocolo de workspace de pnpm: `"@farmatodo-retail-media/types": "workspace:*"` (resuelto por
   `pnpm-workspace.yaml`, `packages: ["apps/*", "packages/*"]`).
-- **No hay build ni bundler** para este paquete (no tsup/rollup/esbuild): `package.json` apunta
-  `"main"`/`"types"` directo a `"./src/index.ts"`. Next.js (vía
-  `transpilePackages: ["@farmatodo-retail-media/types"]` en `next.config.js`) y el toolchain de
-  Nest/ts-node/Jest del backend transpilan ese TypeScript fuente on-the-fly a través del symlink de
-  pnpm en `node_modules/@farmatodo-retail-media/types` → `packages/types`. El único script es
-  `typecheck` (`tsc --noEmit`), que solo verifica tipos, no emite JS.
+- **Build**: `package.json` apunta `"main"`/`"types"` a `"./dist/index.js"` / `"./dist/index.d.ts"`,
+  generados con `pnpm --filter @farmatodo-retail-media/types build` (`tsc -p tsconfig.json`,
+  compilado explícitamente a **CommonJS** — ver nota abajo). Como el `require()` de un `.ts` crudo
+  no funciona con Node en producción (`node dist/main.js` en el backend, o un build en Vercel), el
+  `package.json` de la **raíz** del monorepo declara
+  `"postinstall": "pnpm --filter @farmatodo-retail-media/types build"`, así que
+  **`pnpm install` siempre deja `packages/types/dist` compilado**, tanto en desarrollo local como en
+  un build limpio de CI/Vercel — no hace falta un paso manual aparte. El `build` de la raíz
+  (`pnpm -r build`) también lo recompila. `typecheck` (`tsc --noEmit`) sigue disponible para
+  verificar tipos sin emitir.
 - **Import**: siempre desde la raíz del paquete, sin subpaths —
   `import { ... } from "@farmatodo-retail-media/types";` — usado en más de 80 archivos del repo
   (backend, frontend y scripts de seed/reset).
-- **`tsconfig.json`** propio (`outDir: "dist"`, `rootDir: "src"`) extiende `tsconfig.base.json` de
-  la raíz del monorepo (TypeScript estricto: `strict`, `noUncheckedIndexedAccess`,
-  `exactOptionalPropertyTypes`, `noImplicitOverride`, `declaration`/`declarationMap`); el `outDir`
-  no se usa en el flujo actual (no se invoca `tsc` para emitir), es vestigial por si en el futuro
-  se necesitara compilar/publicar el paquete.
+- **`tsconfig.json`** propio extiende `tsconfig.base.json` de la raíz del monorepo (TypeScript
+  estricto: `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`,
+  `noImplicitOverride`, `declaration`/`declarationMap`), pero **sobreescribe `module: "CommonJS"` y
+  `moduleResolution: "Node"`** en vez de heredar el `module: "ESNext"` de la base (pensado para el
+  bundler del frontend) — si se compilara a ESM, el `require()` de `apps/backend` (CommonJS) no
+  podría cargar el paquete. `outDir: "dist"`, `rootDir: "src"`.
+- **Importante para despliegues**: antes de que existiera el `postinstall` de la raíz, desplegar el
+  backend en cualquier plataforma que corriera el build compilado (Vercel, Render, Docker, etc.)
+  fallaba con `Cannot find module '@farmatodo-retail-media/types'` (en Vercel, como
+  `FUNCTION_INVOCATION_FAILED`), porque el paquete compartido nunca se compilaba a JS. Con el
+  `postinstall`, cualquier plataforma que ejecute `pnpm install` como paso de instalación (Vercel lo
+  hace automáticamente al detectar `pnpm-lock.yaml`) ya deja `packages/types/dist` listo antes de
+  correr el build del backend — no requiere configurar un Build Command especial.
 - **Dependencias**: solo `zod` en runtime; `typescript` como dev dependency.
 
 ## Estructura (`src/`)

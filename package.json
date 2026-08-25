@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
+    "postinstall": "pnpm --filter @farmatodo-retail-media/types build",
     "dev": "pnpm --parallel --filter backend --filter frontend run dev",
     "dev:backend": "pnpm --filter backend dev",
     "dev:frontend": "pnpm --filter frontend dev",
