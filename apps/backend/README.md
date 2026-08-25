@@ -37,7 +37,7 @@ Ejecutar siempre desde la raíz del monorepo con `pnpm --filter backend <script>
 | Script | Comando | Descripción |
 |---|---|---|
 | `dev` | `ts-node-dev --respawn --transpile-only src/main.ts` | Servidor en caliente (hot reload) para desarrollo. |
-| `build` | `tsc -p tsconfig.json` | Compila a `dist/`. |
+| `build` | `pnpm --filter @farmatodo-retail-media/types build && tsc -p tsconfig.json` | Compila primero el paquete compartido (`@farmatodo-retail-media/types`, ver [packages/types/README.md](../../packages/types/README.md)) y luego este backend a `dist/`. Compilar `types` explícitamente en este script (en vez de confiar solo en el `postinstall` de la raíz) evita que un build con caché restaurada en un CI/PaaS se salte ese paso. |
 | `start` | `node dist/main.js` | Arranque en producción, requiere `build` previo. |
 | `test` | `jest` | Corre toda la suite de tests. |
 | `test:watch` | `jest --watch` | Tests en modo watch. |
