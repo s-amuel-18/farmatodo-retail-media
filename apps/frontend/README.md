@@ -36,7 +36,7 @@ Ejecutar con `pnpm --filter frontend <script>` desde la raíz, o directamente en
 | Script | Comando | Descripción |
 |---|---|---|
 | `dev` | `next dev` | Servidor de desarrollo. |
-| `build` | `next build` | Build de producción. |
+| `build` | `pnpm --filter @farmatodo-retail-media/types build && next build` | Compila primero el paquete compartido (`@farmatodo-retail-media/types`, ver [packages/types/README.md](../../packages/types/README.md)) y luego el build de producción de Next.js. Es necesario porque el tipado de `Campaign`/`NewCampaignInput`/etc. se vuelve irresoluble si `packages/types/dist` no existe, lo que rompe el paso "Linting and checking validity of types" de `next build` en un entorno con caché de instalación restaurada (p. ej. Vercel). |
 | `start` | `next start` | Sirve el build de producción. |
 | `lint` | `next lint` | Lint (puede pedir configuración interactiva la primera vez, ya que no hay `.eslintrc*` propio en el proyecto). |
 | `test` | `jest` | Corre toda la suite de tests. |
