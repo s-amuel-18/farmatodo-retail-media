@@ -4,6 +4,19 @@ Prototipo funcional para la gestión del ciclo completo de creación, revisión 
 campañas de Retail Media (piso de venta y canales digitales), con dos roles con permisos
 diferenciados y trazabilidad completa de cada transición de estado.
 
+## Documentación por paquete
+
+Este README cubre la visión general del monorepo. Cada paquete tiene su propio README con el
+detalle completo de su implementación:
+
+- **[apps/backend/README.md](apps/backend/README.md)** — API NestJS: módulos, máquina de estados,
+  cálculo de costos, todos los endpoints HTTP, colecciones de Firestore, scripts de
+  seed/reset/roles, variables de entorno y cobertura de tests.
+- **[apps/frontend/README.md](apps/frontend/README.md)** — cliente Next.js: rutas, autenticación,
+  servicios, view-models, el formulario dinámico de campañas, sistema de diseño y suite de tests.
+- **[packages/types/README.md](packages/types/README.md)** — tipos y esquemas zod compartidos:
+  modelo de `Campaign` por canal, validaciones, y por qué existe este paquete.
+
 ## Stack
 
 - **Backend**: NestJS + TypeScript estricto, arquitectura hexagonal (dominio / aplicación /
@@ -143,9 +156,11 @@ recibe el mismo `403`. En ningún caso la evaluación del rol depende de la inte
 ## Testing
 
 ```bash
-cd apps/backend
-pnpm test
+pnpm --filter backend test     # 16 archivos de test, 93+ bloques it/it.each
+pnpm --filter frontend test    # 53 archivos de test (~6000 líneas)
 ```
+
+Backend (detalle completo en [apps/backend/README.md](apps/backend/README.md#testing)):
 
 - `domain/`: máquina de estados y cálculo de costo — funciones puras, sin mocks, incluyendo los
   cuatro canales y los casos límite de costo (cantidad 0, proveedor sin costo configurado para ese
@@ -165,6 +180,11 @@ pnpm test
   encadenada aporta poca señal; la cobertura real de esa capa es el Firestore Emulator, que sigue
   como deuda técnica (ver abajo).
 
+Frontend (detalle completo en [apps/frontend/README.md](apps/frontend/README.md#testing)): suite
+con `@testing-library/react` cubriendo páginas, layout, middleware, servicios, view-models, vistas
+y componentes de UI. Esta suite se agregó después de la ventana original de 48 horas — ver nota en
+"Deuda técnica" más abajo.
+
 ## Roadmap ejecutado (ventana de 48 horas)
 
 | Bloque | Foco | Estado |
@@ -176,9 +196,12 @@ pnpm test
 
 ## Deuda técnica asumida
 
-- **Tests de frontend**: no se escribieron (se priorizó el dominio y la seguridad del backend, que es
-  lo que puntúa explícitamente). La separación de capas MVVM sí se respetó de forma consistente para
-  que sean triviales de agregar después.
+- **Tests de frontend**: en la ventana original de 48 horas no se escribieron (se priorizó el
+  dominio y la seguridad del backend, que es lo que puntúa explícitamente); la separación de capas
+  MVVM se respetó de forma consistente precisamente para que fueran triviales de agregar después.
+  Esa suite ya se agregó (53 archivos de test con `@testing-library/react`, ver
+  [apps/frontend/README.md](apps/frontend/README.md#testing)), por lo que este punto ya no es deuda
+  pendiente, solo se documenta como parte del historial del proyecto.
 - **Tests de integración con Firestore Emulator**: no se configuraron; el desarrollo y las pruebas
   manuales se hicieron contra el proyecto real de Firebase, no contra un emulador local.
 - **`firestore.rules` / índices**: el despliegue automático vía Firebase CLI requiere login
@@ -196,8 +219,12 @@ pnpm test
 - **Concurrencia en edición**: `PATCH /campaigns/:id` sobreescribe sin control de versión optimista
   (last-write-wins). Para una campaña que solo su dueño puede editar y en estados no concurrentes
   (DRAFT/REJECTED), el riesgo real es bajo, pero es una simplificación consciente.
-- **Diseño visual**: CSS mínimo inline, sin sistema de diseño ni responsive refinado — explícitamente
-  fuera de alcance según el enunciado ("no se busca... refinamiento visual").
+- **Diseño visual**: en la ventana original se dejó como CSS mínimo inline, sin sistema de diseño,
+  explícitamente fuera de alcance según el enunciado ("no se busca... refinamiento visual"). Desde
+  entonces se incorporó un sistema de diseño completo con Tailwind CSS v4 (tokens, modo oscuro,
+  componentes de UI reutilizables) documentado en
+  [apps/frontend/DESIGN.md](apps/frontend/DESIGN.md) y en
+  [apps/frontend/README.md](apps/frontend/README.md#estilos).
 - **Colecciones `users` / `approvals` / módulo `users` de NestJS**: el enunciado las menciona, pero se
   optó por no crear una colección `users` en Firestore (el rol vive únicamente en el custom claim del
   token, que es la fuente de verdad que el propio enunciado exige) ni una colección `approvals`
