@@ -4,6 +4,7 @@ import { CAMPAIGN_REPOSITORY } from "./application/ports/campaign-repository.por
 import { MEDIA_COST_REPOSITORY } from "./application/ports/media-cost-repository.port";
 import { ApproveCampaignUseCase } from "./application/use-cases/approve-campaign.use-case";
 import { CreateCampaignUseCase } from "./application/use-cases/create-campaign.use-case";
+import { EstimateCostUseCase } from "./application/use-cases/estimate-cost.use-case";
 import { GetCampaignUseCase } from "./application/use-cases/get-campaign.use-case";
 import { ListCampaignsUseCase } from "./application/use-cases/list-campaigns.use-case";
 import { RejectCampaignUseCase } from "./application/use-cases/reject-campaign.use-case";
@@ -57,6 +58,11 @@ import type { MediaCostRepository } from "./application/ports/media-cost-reposit
       provide: RejectCampaignUseCase,
       inject: [CAMPAIGN_REPOSITORY],
       useFactory: (repo: CampaignRepository) => new RejectCampaignUseCase(repo),
+    },
+    {
+      provide: EstimateCostUseCase,
+      inject: [MEDIA_COST_REPOSITORY],
+      useFactory: (costs: MediaCostRepository) => new EstimateCostUseCase(costs),
     },
   ],
 })

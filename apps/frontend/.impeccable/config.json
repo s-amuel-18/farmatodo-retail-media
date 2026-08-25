@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-radius",
+        "value": "2px",
+        "files": [
+          "src/app/globals.css"
+        ],
+        "createdAt": "2026-08-24T22:21:24.877Z",
+        "reason": "pre-existing :focus-visible ring corner radius in globals.css, not a component shape; unrelated to dark-mode token edit"
+      }
+    ]
+  }
+}

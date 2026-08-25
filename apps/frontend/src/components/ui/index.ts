@@ -14,5 +14,6 @@ export { EmptyState } from "./EmptyState";
 export { LoadingState } from "./Spinner";
 export { ErrorText } from "./ErrorText";
 export { ToggleChip } from "./ToggleChip";
+export { ThemeToggle } from "./ThemeToggle";
 export { MultiCombobox } from "./MultiCombobox";
 export type { ComboboxOption } from "./MultiCombobox";

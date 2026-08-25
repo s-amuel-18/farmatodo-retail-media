@@ -12,11 +12,13 @@ import { RolesGuard } from "../../../auth/roles.guard";
 import { ZodValidationPipe } from "../../../common/zod-validation.pipe";
 import { ApproveCampaignUseCase } from "../../application/use-cases/approve-campaign.use-case";
 import { CreateCampaignUseCase } from "../../application/use-cases/create-campaign.use-case";
+import { EstimateCostUseCase } from "../../application/use-cases/estimate-cost.use-case";
 import { GetCampaignUseCase } from "../../application/use-cases/get-campaign.use-case";
 import { ListCampaignsUseCase } from "../../application/use-cases/list-campaigns.use-case";
 import { RejectCampaignUseCase } from "../../application/use-cases/reject-campaign.use-case";
 import { SubmitCampaignUseCase } from "../../application/use-cases/submit-campaign.use-case";
 import { UpdateCampaignUseCase } from "../../application/use-cases/update-campaign.use-case";
+import { CostEstimateQueryDto, costEstimateQuerySchema } from "./dto/cost-estimate.query";
 import { ListCampaignsQueryDto, parseListFilters } from "./dto/list-campaigns.query";
 
 @Controller("campaigns")
@@ -30,6 +32,7 @@ export class CampaignsController {
     private readonly submitCampaign: SubmitCampaignUseCase,
     private readonly approveCampaign: ApproveCampaignUseCase,
     private readonly rejectCampaign: RejectCampaignUseCase,
+    private readonly estimateCost: EstimateCostUseCase,
   ) {}
 
   @Post()
@@ -56,6 +59,13 @@ export class CampaignsController {
   list(@Query() query: ListCampaignsQueryDto, @CurrentUser() actor: AuthenticatedUser) {
     const filters: CampaignListFilters = parseListFilters(query);
     return this.listCampaigns.execute({ filters, actor });
+  }
+
+  // Registered before ":id" — otherwise Nest would match this path as a campaign id.
+  @Get("cost-estimate")
+  @Roles("COMMERCIAL_ANALYST")
+  getCostEstimate(@Query(new ZodValidationPipe(costEstimateQuerySchema)) query: CostEstimateQueryDto) {
+    return this.estimateCost.execute(query);
   }
 
   @Get(":id")

@@ -58,7 +58,7 @@ export function CampaignsInboxView({
       </p>
 
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-navy-900">Mis campañas</h1>
+        <h1 className="text-xl font-semibold text-ink">Mis campañas</h1>
         <Link href="/campaigns/new" className={buttonClassName("primary")}>
           <span aria-hidden="true">+</span> Nueva campaña
         </Link>

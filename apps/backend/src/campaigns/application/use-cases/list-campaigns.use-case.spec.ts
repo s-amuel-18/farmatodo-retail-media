@@ -26,7 +26,7 @@ const input: NewCampaignInput = {
 async function setup() {
   const campaignRepository = new InMemoryCampaignRepository();
   const mediaCostRepository = new InMemoryMediaCostRepository([
-    { id: "mc-1", supplierId: "supplier-1", channel: "SMS", unitCostUsd: 10 },
+    { id: "mc-1", supplierId: "supplier-1", channel: "SMS", unitCostUsd: 10, pricingModel: "FLAT" },
   ]);
   const createUseCase = new CreateCampaignUseCase(campaignRepository, mediaCostRepository);
   await createUseCase.execute({ data: input, actor: analystA });

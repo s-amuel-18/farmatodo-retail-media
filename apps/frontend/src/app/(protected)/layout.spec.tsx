@@ -1,11 +1,17 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { ReactNode } from "react";
 import ProtectedLayout from "./layout";
 import { useSession } from "../../view-models/session/session-context";
+import { ThemeProvider } from "@/view-models/theme/theme-context";
 
 jest.mock("../../view-models/session/session-context", () => ({
   useSession: jest.fn(),
 }));
+
+function renderLayout(children: ReactNode) {
+  return render(<ThemeProvider>{children}</ThemeProvider>);
+}
 
 describe("ProtectedLayout", () => {
   it("renders the AppHeader with the user's role label and home link when a role is assigned", () => {
@@ -14,7 +20,7 @@ describe("ProtectedLayout", () => {
       actions: { signOut: jest.fn() },
     });
 
-    render(
+    renderLayout(
       <ProtectedLayout>
         <p>contenido protegido</p>
       </ProtectedLayout>,
@@ -31,7 +37,7 @@ describe("ProtectedLayout", () => {
       actions: { signOut: jest.fn() },
     });
 
-    render(
+    renderLayout(
       <ProtectedLayout>
         <p>contenido protegido</p>
       </ProtectedLayout>,
@@ -49,7 +55,7 @@ describe("ProtectedLayout", () => {
       actions: { signOut },
     });
 
-    render(
+    renderLayout(
       <ProtectedLayout>
         <p>contenido</p>
       </ProtectedLayout>,

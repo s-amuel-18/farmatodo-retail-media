@@ -33,7 +33,7 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
           control — a visible ring around the whole content region reads as broken,
           and reaching it already comes with an obvious visual context change. */}
       <main id="main-content" tabIndex={-1} className="p-6 outline-none">
-        {children}
+        <div className="mx-auto w-full max-w-5xl">{children}</div>
       </main>
     </div>
   );

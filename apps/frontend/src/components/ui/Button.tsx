@@ -12,11 +12,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   // blue-700, not the lighter blue-600 swatch: white text on blue-600 only reaches 3.4:1 (fails 4.5:1 body-text contrast).
-  primary: "bg-brand-blue-700 text-white hover:bg-brand-blue-800 disabled:bg-navy-100 disabled:text-text-muted",
+  primary: "bg-brand-blue-700 text-white hover:bg-brand-blue-800 disabled:bg-tint disabled:text-text-muted",
   secondary:
-    "bg-surface text-navy-900 border border-border hover:border-navy-700 disabled:text-text-muted disabled:hover:border-border",
-  ghost: "bg-transparent text-navy-900 hover:bg-navy-100 disabled:text-text-muted disabled:hover:bg-transparent",
-  danger: "bg-danger-600 text-white hover:bg-danger-600/90 disabled:bg-navy-100 disabled:text-text-muted",
+    "bg-surface text-ink border border-border hover:border-navy-700 disabled:text-text-muted disabled:hover:border-border",
+  ghost: "bg-transparent text-ink hover:bg-tint disabled:text-text-muted disabled:hover:bg-transparent",
+  danger: "bg-danger-600 text-white hover:bg-danger-600/90 disabled:bg-tint disabled:text-text-muted",
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {

@@ -64,7 +64,7 @@ export function ApprovalsQueueView({
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold text-navy-900">Bandeja de aprobación</h1>
+      <h1 className="mb-4 text-xl font-semibold text-ink">Bandeja de aprobación</h1>
 
       <p role="status" aria-live="polite" className="sr-only">
         {statusMessage}

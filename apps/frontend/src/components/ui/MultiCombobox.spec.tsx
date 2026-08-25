@@ -116,7 +116,7 @@ describe("MultiCombobox", () => {
     await user.click(input);
 
     // Opening the listbox highlights the first option (index 0, "Farmatodo").
-    expect(screen.getAllByRole("option")[0]).toHaveClass("bg-brand-blue-50");
+    expect(screen.getAllByRole("option")[0]).toHaveClass("bg-highlight");
 
     // ArrowDown advances the highlight to index 1, "Cruz Verde".
     await user.keyboard("{ArrowDown}");
@@ -143,17 +143,17 @@ describe("MultiCombobox", () => {
     await user.click(input);
 
     const options = screen.getAllByRole("option");
-    expect(options[0]).toHaveClass("bg-brand-blue-50");
-    expect(options[1]).not.toHaveClass("bg-brand-blue-50");
+    expect(options[0]).toHaveClass("bg-highlight");
+    expect(options[1]).not.toHaveClass("bg-highlight");
 
     await user.keyboard("{ArrowDown}");
     const optionsAfter = screen.getAllByRole("option");
-    expect(optionsAfter[1]).toHaveClass("bg-brand-blue-50");
-    expect(optionsAfter[0]).not.toHaveClass("bg-brand-blue-50");
+    expect(optionsAfter[1]).toHaveClass("bg-highlight");
+    expect(optionsAfter[0]).not.toHaveClass("bg-highlight");
 
     await user.keyboard("{ArrowUp}");
     const optionsAfterUp = screen.getAllByRole("option");
-    expect(optionsAfterUp[0]).toHaveClass("bg-brand-blue-50");
+    expect(optionsAfterUp[0]).toHaveClass("bg-highlight");
   });
 
   it("Escape closes the listbox and clears the query", async () => {

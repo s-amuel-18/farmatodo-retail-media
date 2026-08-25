@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { newCampaignInputSchema } from "@farmatodo-retail-media/types";
 import type {
@@ -13,6 +13,7 @@ import type {
   PetaloZone,
   Product,
 } from "@farmatodo-retail-media/types";
+import { CHANNEL_TYPES } from "@/lib/campaign-vocabulary";
 import { campaignsService } from "../../services/campaigns.service";
 
 export interface CampaignFormValues {
@@ -172,20 +173,25 @@ function toPayload(values: CampaignFormValues): NewCampaignInput {
   }
 }
 
-/**
- * Referential estimate only, shown while the analyst fills the form — the
- * source of truth is `calculateTotalCost` on the backend, which recomputes
- * and validates the real cost at save time regardless of what this returns.
- */
-function estimateCost(values: CampaignFormValues, mediaCosts: MediaCost[]): number | null {
-  const found = mediaCosts.find(
-    (m) => m.supplierId === values.supplierId && m.channel === values.channel,
-  );
-  if (!found) return null;
-  const quantity =
-    values.channel === "PETALO" || values.channel === "PARRILLERA" ? Number(values.quantity) || 0 : 1;
-  return Math.round(found.unitCostUsd * quantity * 100) / 100;
+/** Channels a supplier actually has a rate for, derived from its MediaCost rows. */
+function channelsForSupplier(supplierId: string, mediaCosts: MediaCost[]): ChannelType[] {
+  if (!supplierId) return CHANNEL_TYPES.slice();
+  const channels = [...new Set(mediaCosts.filter((m) => m.supplierId === supplierId).map((m) => m.channel))];
+  return channels.length > 0 ? channels : CHANNEL_TYPES.slice();
 }
+
+/** Debounces a fast-changing value (e.g. a quantity field) so dependent fetches don't fire on every keystroke. */
+function useDebouncedValue<T>(value: T, delayMs: number): { value: T; isPending: boolean } {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delayMs);
+    return () => clearTimeout(id);
+  }, [value, delayMs]);
+  return { value: debounced, isPending: debounced !== value };
+}
+
+/** Channels whose cost can depend on `quantity` (PER_UNIT pricing multiplies by it). */
+const CHANNELS_WITH_QUANTITY: ReadonlySet<ChannelType> = new Set(["PETALO", "PARRILLERA"]);
 
 /** Maps a zod issue path on the API payload back to the form field it came from. */
 const PAYLOAD_PATH_TO_FIELD: Record<string, keyof CampaignFormValues> = {
@@ -235,7 +241,34 @@ export function useCampaignForm({ target, initialCampaign, products, mediaCosts 
 
   const values = watch();
   const filteredProducts = products.filter((p) => values.brandIds?.includes(p.brandId));
-  const estimatedCost = estimateCost(values, mediaCosts);
+  const availableChannels =
+    target.mode === "edit" ? CHANNEL_TYPES.slice() : channelsForSupplier(values.supplierId, mediaCosts);
+
+  const usesQuantity = CHANNELS_WITH_QUANTITY.has(values.channel);
+  const { value: debouncedQuantity, isPending: isQuantityPending } = useDebouncedValue(values.quantity, 350);
+  const costEstimateQuery = useQuery({
+    queryKey: ["cost-estimate", values.supplierId, values.channel, usesQuantity ? debouncedQuantity : null],
+    queryFn: () =>
+      campaignsService.estimateCost({
+        supplierId: values.supplierId,
+        channel: values.channel,
+        ...(usesQuantity ? { quantity: debouncedQuantity } : {}),
+      }),
+    enabled: Boolean(values.supplierId) && Boolean(values.channel),
+    retry: false,
+  });
+  const estimatedCost = costEstimateQuery.data?.totalCostUsd ?? null;
+  const isEstimatingCost = costEstimateQuery.isFetching || (usesQuantity && isQuantityPending);
+
+  useEffect(() => {
+    if (target.mode === "edit") return;
+    const allowed = channelsForSupplier(values.supplierId, mediaCosts);
+    const fallback = allowed[0];
+    if (fallback && !allowed.includes(values.channel)) {
+      setValue("channel", fallback, { shouldDirty: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values.supplierId, mediaCosts, target.mode]);
 
   function onBrandsChange(nextBrandIds: string[]) {
     setValue("brandIds", nextBrandIds, { shouldDirty: true });
@@ -291,6 +324,8 @@ export function useCampaignForm({ target, initialCampaign, products, mediaCosts 
     onBrandsChange,
     onProductsChange,
     estimatedCost,
+    isEstimatingCost,
+    availableChannels,
     isSubmitting: mutation.isPending,
     fieldErrors,
     error: validationError ?? (mutation.error instanceof Error ? mutation.error.message : null),

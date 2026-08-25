@@ -61,6 +61,8 @@ describe("NewCampaignPage", () => {
       onBrandsChange,
       onProductsChange: jest.fn(),
       estimatedCost: null,
+      isEstimatingCost: false,
+      availableChannels: ["PETALO", "PARRILLERA", "SMS", "TIKTOK"],
       isSubmitting: false,
       fieldErrors: {},
       error: null,

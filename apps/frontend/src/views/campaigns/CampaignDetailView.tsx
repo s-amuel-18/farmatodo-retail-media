@@ -99,7 +99,7 @@ export function CampaignDetailView({
   if (error) return <ErrorText>{error}</ErrorText>;
 
   return (
-    <div className="max-w-2xl">
+    <div className="mx-auto max-w-2xl">
       <Link href={backHref} className="mb-3 inline-block text-sm text-brand-blue-700 hover:underline">
         ← Volver
       </Link>
@@ -108,7 +108,7 @@ export function CampaignDetailView({
       </p>
 
       <div className="mb-4 flex items-center gap-3">
-        <h1 className="text-xl font-semibold text-navy-900">{campaign.name}</h1>
+        <h1 className="text-xl font-semibold text-ink">{campaign.name}</h1>
         <StatusBadge status={campaign.status} />
       </div>
 
@@ -153,7 +153,7 @@ export function CampaignDetailView({
         ) : (
           <ul className="space-y-2 text-sm">
             {history.map((entry) => (
-              <li key={entry.id} className="border-l-2 border-navy-100 pl-3">
+              <li key={entry.id} className="border-l-2 border-border pl-3">
                 <strong className="text-ink">{HISTORY_ACTION_LABELS[entry.action]}</strong>
                 {" — "}
                 {new Date(entry.occurredAt).toLocaleString()}

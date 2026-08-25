@@ -25,6 +25,7 @@ function makeController() {
   const submitCampaign = { execute: jest.fn().mockResolvedValue("submitted") };
   const approveCampaign = { execute: jest.fn().mockResolvedValue("approved") };
   const rejectCampaign = { execute: jest.fn().mockResolvedValue("rejected") };
+  const estimateCost = { execute: jest.fn().mockResolvedValue({ totalCostUsd: 100 }) };
 
   const controller = new CampaignsController(
     createCampaign as never,
@@ -34,6 +35,7 @@ function makeController() {
     submitCampaign as never,
     approveCampaign as never,
     rejectCampaign as never,
+    estimateCost as never,
   );
 
   return {
@@ -45,6 +47,7 @@ function makeController() {
     submitCampaign,
     approveCampaign,
     rejectCampaign,
+    estimateCost,
   };
 }
 
@@ -103,6 +106,18 @@ describe("CampaignsController (routing/wiring)", () => {
       campaignId: "campaign-1",
       comment: "Presupuesto excede el límite",
       actor,
+    });
+  });
+
+  it("getCostEstimate() forwards the parsed query to EstimateCostUseCase", async () => {
+    const { controller, estimateCost } = makeController();
+    await expect(
+      controller.getCostEstimate({ channel: "PETALO", supplierId: "supplier-1", quantity: 3 }),
+    ).resolves.toEqual({ totalCostUsd: 100 });
+    expect(estimateCost.execute).toHaveBeenCalledWith({
+      channel: "PETALO",
+      supplierId: "supplier-1",
+      quantity: 3,
     });
   });
 });

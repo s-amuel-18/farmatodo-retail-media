@@ -68,7 +68,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
         className="w-full max-w-md rounded-control bg-surface p-6 shadow-float focus:outline-none"
         onClick={(event) => event.stopPropagation()}
       >
-        <h2 id="modal-title" className="mb-4 text-base font-semibold text-navy-900">
+        <h2 id="modal-title" className="mb-4 text-base font-semibold text-ink">
           {title}
         </h2>
         {children}

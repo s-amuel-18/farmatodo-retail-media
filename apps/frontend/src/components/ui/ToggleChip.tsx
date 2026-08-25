@@ -8,7 +8,7 @@ const TONE_ACTIVE_CLASSES: Record<BadgeTone, string> = {
   pending: "border-status-pending-fg/25 bg-status-pending-bg text-status-pending-fg",
   approved: "border-status-approved-fg/25 bg-status-approved-bg text-status-approved-fg",
   rejected: "border-status-rejected-fg/25 bg-status-rejected-bg text-status-rejected-fg",
-  neutral: "border-navy-900/20 bg-navy-100 text-navy-900",
+  neutral: "border-tint-fg/20 bg-tint text-tint-fg",
 };
 
 interface ToggleChipProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onChange"> {

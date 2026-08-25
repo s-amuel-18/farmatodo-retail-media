@@ -7,7 +7,7 @@ const TONE_CLASSES: Record<BadgeTone, string> = {
   pending: "bg-status-pending-bg text-status-pending-fg",
   approved: "bg-status-approved-bg text-status-approved-fg",
   rejected: "bg-status-rejected-bg text-status-rejected-fg",
-  neutral: "bg-navy-100 text-navy-900",
+  neutral: "bg-tint text-tint-fg",
 };
 
 export function Badge({ tone, children }: { tone: BadgeTone; children: ReactNode }) {

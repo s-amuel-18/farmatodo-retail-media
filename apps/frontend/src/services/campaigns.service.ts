@@ -1,6 +1,7 @@
 import type {
   Campaign,
   CampaignListFilters,
+  ChannelType,
   HistoryEntry,
   NewCampaignInput,
   Paginated,
@@ -10,6 +11,22 @@ import { apiClient } from "./api-client";
 export interface CampaignWithHistory {
   campaign: Campaign;
   history: HistoryEntry[];
+}
+
+export interface EstimateCostParams {
+  channel: ChannelType;
+  supplierId: string;
+  quantity?: number;
+}
+
+export interface CostEstimate {
+  totalCostUsd: number;
+}
+
+function toCostEstimateQueryString(params: EstimateCostParams): string {
+  const query = new URLSearchParams({ channel: params.channel, supplierId: params.supplierId });
+  if (params.quantity !== undefined) query.set("quantity", String(params.quantity));
+  return query.toString();
 }
 
 function toQueryString(filters: CampaignListFilters): string {
@@ -42,5 +59,9 @@ export const campaignsService = {
 
   submit(id: string): Promise<Campaign> {
     return apiClient.post<Campaign>(`/campaigns/${id}/submit`);
+  },
+
+  estimateCost(params: EstimateCostParams): Promise<CostEstimate> {
+    return apiClient.get<CostEstimate>(`/campaigns/cost-estimate?${toCostEstimateQueryString(params)}`);
   },
 };

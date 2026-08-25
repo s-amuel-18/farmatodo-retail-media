@@ -93,7 +93,12 @@ describe("referenceDataService", () => {
   describe("listMediaCosts", () => {
     it("reads from the mediaCosts collection and maps docs to { id, ...data }", async () => {
       mockGetDocs.mockResolvedValue(
-        makeSnap([{ id: "cost-1", data: { supplierId: "sup-1", channel: "SMS", unitCostUsd: 5 } }]),
+        makeSnap([
+          {
+            id: "cost-1",
+            data: { supplierId: "sup-1", channel: "SMS", unitCostUsd: 5, pricingModel: "FLAT" },
+          },
+        ]),
       );
 
       const result = await referenceDataService.listMediaCosts();
@@ -103,7 +108,7 @@ describe("referenceDataService", () => {
         FIRESTORE_COLLECTIONS.mediaCosts,
       );
       expect(result).toEqual([
-        { id: "cost-1", supplierId: "sup-1", channel: "SMS", unitCostUsd: 5 },
+        { id: "cost-1", supplierId: "sup-1", channel: "SMS", unitCostUsd: 5, pricingModel: "FLAT" },
       ]);
     });
   });

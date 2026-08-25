@@ -19,12 +19,12 @@ const products: Product[] = [
 ];
 
 const mediaCosts: MediaCost[] = [
-  { id: "mc-supplier-1-petalo", supplierId: "supplier-1", channel: "PETALO", unitCostUsd: 150 },
-  { id: "mc-supplier-1-parrillera", supplierId: "supplier-1", channel: "PARRILLERA", unitCostUsd: 90 },
-  { id: "mc-supplier-1-sms", supplierId: "supplier-1", channel: "SMS", unitCostUsd: 300 },
-  { id: "mc-supplier-1-tiktok", supplierId: "supplier-1", channel: "TIKTOK", unitCostUsd: 250 },
-  { id: "mc-supplier-2-petalo", supplierId: "supplier-2", channel: "PETALO", unitCostUsd: 180 },
-  { id: "mc-supplier-2-sms", supplierId: "supplier-2", channel: "SMS", unitCostUsd: 320 },
+  { id: "mc-supplier-1-petalo", supplierId: "supplier-1", channel: "PETALO", unitCostUsd: 150, pricingModel: "PER_UNIT" },
+  { id: "mc-supplier-1-parrillera", supplierId: "supplier-1", channel: "PARRILLERA", unitCostUsd: 90, pricingModel: "PER_UNIT" },
+  { id: "mc-supplier-1-sms", supplierId: "supplier-1", channel: "SMS", unitCostUsd: 300, pricingModel: "FLAT" },
+  { id: "mc-supplier-1-tiktok", supplierId: "supplier-1", channel: "TIKTOK", unitCostUsd: 250, pricingModel: "FLAT" },
+  { id: "mc-supplier-2-petalo", supplierId: "supplier-2", channel: "PETALO", unitCostUsd: 180, pricingModel: "PER_UNIT" },
+  { id: "mc-supplier-2-sms", supplierId: "supplier-2", channel: "SMS", unitCostUsd: 320, pricingModel: "FLAT" },
 ];
 
 async function seedByField<T>(
@@ -41,17 +41,24 @@ async function seedByField<T>(
   console.log(`Seeded ${items.length} docs into '${collection}'`);
 }
 
-async function main() {
-  initAdmin();
+/** Writes the catalog seed data (suppliers, brands, products, mediaCosts). Assumes admin is already initialized. */
+export async function seedAll(): Promise<void> {
   await seedByField(FIRESTORE_COLLECTIONS.suppliers, suppliers, (s) => s.id);
   await seedByField(FIRESTORE_COLLECTIONS.brands, brands, (b) => b.id);
   await seedByField(FIRESTORE_COLLECTIONS.products, products, (p) => p.sku);
   await seedByField(FIRESTORE_COLLECTIONS.mediaCosts, mediaCosts, (m) => m.id);
 }
 
-main()
-  .then(() => process.exit(0))
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
+async function main() {
+  initAdmin();
+  await seedAll();
+}
+
+if (require.main === module) {
+  main()
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+}

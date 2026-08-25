@@ -20,6 +20,8 @@ export default function EditCampaignPage() {
     onBrandsChange,
     onProductsChange,
     estimatedCost,
+    isEstimatingCost,
+    availableChannels,
     isSubmitting,
     error,
     fieldErrors,
@@ -45,7 +47,9 @@ export default function EditCampaignPage() {
       onBrandsChange={onBrandsChange}
       onProductsChange={onProductsChange}
       suppliers={suppliers}
+      availableChannels={availableChannels}
       estimatedCost={estimatedCost}
+      isEstimatingCost={isEstimatingCost}
       isSubmitting={isSubmitting}
       error={error}
       fieldErrors={fieldErrors}

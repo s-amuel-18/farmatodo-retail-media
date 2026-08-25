@@ -7,13 +7,13 @@ describe("Button", () => {
   it("renders the primary variant classes by default variant prop omitted (defaults to secondary)", () => {
     render(<Button>Click me</Button>);
     const button = screen.getByRole("button", { name: "Click me" });
-    expect(button).toHaveClass("bg-surface", "text-navy-900", "border", "border-border");
+    expect(button).toHaveClass("bg-surface", "text-ink", "border", "border-border");
   });
 
   it.each<["primary" | "secondary" | "ghost" | "danger", string[]]>([
     ["primary", ["bg-brand-blue-700", "text-white"]],
-    ["secondary", ["bg-surface", "text-navy-900"]],
-    ["ghost", ["bg-transparent", "text-navy-900"]],
+    ["secondary", ["bg-surface", "text-ink"]],
+    ["ghost", ["bg-transparent", "text-ink"]],
     ["danger", ["bg-danger-600", "text-white"]],
   ])("applies the %s variant classes", (variant, expectedClasses) => {
     render(<Button variant={variant}>Action</Button>);

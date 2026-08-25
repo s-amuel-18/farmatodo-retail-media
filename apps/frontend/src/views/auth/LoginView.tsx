@@ -18,7 +18,7 @@ export function LoginView({ isLoading, pendingAccess, error, onSignIn, onSignOut
     >
       <Card className="w-full max-w-sm text-center shadow-float">
         <BrandLogo className="mx-auto mb-6 h-8 w-auto" />
-        <h1 className="mb-1 text-xl font-semibold text-navy-900">Retail Media</h1>
+        <h1 className="mb-1 text-xl font-semibold text-ink">Retail Media</h1>
         <p className="mb-6 text-sm text-text-muted">Farmatodo — gestión de campañas</p>
 
         {pendingAccess ? (

@@ -32,7 +32,9 @@ function createWrapper() {
 const brands: Brand[] = [{ id: "b1", name: "Brand 1" }];
 const products: Product[] = [{ sku: "sku-1", name: "Product 1", brandId: "b1" }];
 const suppliers: Supplier[] = [{ id: "s1", name: "Supplier 1" }];
-const mediaCosts: MediaCost[] = [{ id: "m1", supplierId: "s1", channel: "PETALO", unitCostUsd: 10 }];
+const mediaCosts: MediaCost[] = [
+  { id: "m1", supplierId: "s1", channel: "PETALO", unitCostUsd: 10, pricingModel: "PER_UNIT" },
+];
 
 describe("useReferenceData", () => {
   beforeEach(() => {

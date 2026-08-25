@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import type { Brand, ChannelType, Product, Supplier } from "@farmatodo-retail-media/types";
 import { CampaignFormView } from "./CampaignFormView";
 import type { CampaignFormValues } from "../../view-models/campaigns/useCampaignForm";
+import { CHANNEL_TYPES } from "../../lib/campaign-vocabulary";
 
 const EMPTY_DEFAULTS: CampaignFormValues = {
   name: "",
@@ -37,7 +38,9 @@ interface HarnessProps {
   brands?: Brand[];
   filteredProducts?: Product[];
   suppliers?: Supplier[];
+  availableChannels?: ChannelType[];
   estimatedCost?: number | null;
+  isEstimatingCost?: boolean;
   isSubmitting?: boolean;
   error?: string | null;
   backHref?: string;
@@ -53,7 +56,9 @@ function Harness({
   brands = [],
   filteredProducts = [],
   suppliers = [],
+  availableChannels = CHANNEL_TYPES.slice(),
   estimatedCost = null,
+  isEstimatingCost = false,
   isSubmitting = false,
   error = null,
   backHref = "/campaigns",
@@ -82,7 +87,9 @@ function Harness({
       onBrandsChange={onBrandsChange}
       onProductsChange={onProductsChange}
       suppliers={suppliers}
+      availableChannels={availableChannels}
       estimatedCost={estimatedCost}
+      isEstimatingCost={isEstimatingCost}
       isSubmitting={isSubmitting}
       error={error}
       backHref={backHref}
@@ -248,6 +255,12 @@ describe("CampaignFormView", () => {
 
     rerender(<Harness estimatedCost={42.5} />);
     expect(screen.getByText("$42.50")).toBeInTheDocument();
+  });
+
+  it("shows a calculating placeholder and disables submit while the estimate is being fetched", () => {
+    render(<Harness estimatedCost={null} isEstimatingCost />);
+    expect(screen.getByText("Calculando...")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Guardar" })).toBeDisabled();
   });
 
   it("renders the error message when provided", () => {

@@ -2,6 +2,7 @@ jest.mock("../../services/campaigns.service", () => ({
   campaignsService: {
     create: jest.fn(),
     update: jest.fn(),
+    estimateCost: jest.fn(),
   },
 }));
 
@@ -16,7 +17,6 @@ import { useRouter } from "next/navigation";
 import { createElement, type ReactNode } from "react";
 import type {
   Campaign,
-  MediaCost,
   ParrilleraCampaign,
   PetaloCampaign,
   Product,
@@ -29,6 +29,7 @@ import { CampaignFormView } from "../../views/campaigns/CampaignFormView";
 
 const mockCreate = campaignsService.create as jest.Mock;
 const mockUpdate = campaignsService.update as jest.Mock;
+const mockEstimateCost = campaignsService.estimateCost as jest.Mock;
 const mockPush = jest.fn();
 const mockReplace = jest.fn();
 (useRouter as jest.Mock).mockReturnValue({ push: mockPush, replace: mockReplace });
@@ -147,6 +148,8 @@ const products: Product[] = [
 describe("useCampaignForm", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Default so tests unrelated to the estimate don't need to stub every call themselves.
+    mockEstimateCost.mockResolvedValue({ totalCostUsd: 0 });
   });
 
   describe("default values", () => {
@@ -265,14 +268,19 @@ describe("useCampaignForm", () => {
   });
 
   describe("estimatedCost", () => {
-    const mediaCosts: MediaCost[] = [
-      { id: "m1", supplierId: "s1", channel: "PETALO", unitCostUsd: 10.256 },
-      { id: "m2", supplierId: "s2", channel: "PARRILLERA", unitCostUsd: 7.5 },
-      { id: "m3", supplierId: "s3", channel: "SMS", unitCostUsd: 15 },
-      { id: "m4", supplierId: "s4", channel: "TIKTOK", unitCostUsd: 3 },
-    ];
+    it("is null and no fetch happens until a supplier is selected", () => {
+      const { wrapper } = createWrapper();
+      const { result } = renderHook(
+        () => useCampaignForm({ target: { mode: "create" }, initialCampaign: null, products: [], mediaCosts: [] }),
+        { wrapper },
+      );
 
-    it("multiplies unitCostUsd by quantity for PETALO, rounded to 2 decimals", () => {
+      expect(result.current.estimatedCost).toBeNull();
+      expect(mockEstimateCost).not.toHaveBeenCalled();
+    });
+
+    it("fetches the estimate from the backend for the selected supplier/channel/quantity, and reflects it once resolved", async () => {
+      mockEstimateCost.mockResolvedValue({ totalCostUsd: 51.28 });
       const { wrapper } = createWrapper();
       const { result } = renderHook(
         () =>
@@ -280,33 +288,28 @@ describe("useCampaignForm", () => {
             target: { mode: "edit", campaignId: petaloCampaign.id },
             initialCampaign: petaloCampaign,
             products: [],
-            mediaCosts,
+            mediaCosts: [],
           }),
         { wrapper },
       );
 
-      // supplierId "s1", quantity 5, unitCostUsd 10.256 -> 51.28 rounded
-      expect(result.current.estimatedCost).toBe(51.28);
-    });
-
-    it("multiplies unitCostUsd by quantity for PARRILLERA", () => {
-      const { wrapper } = createWrapper();
-      const { result } = renderHook(
-        () =>
-          useCampaignForm({
-            target: { mode: "edit", campaignId: parrilleraCampaign.id },
-            initialCampaign: parrilleraCampaign,
-            products: [],
-            mediaCosts,
-          }),
-        { wrapper },
+      await waitFor(() =>
+        expect(mockEstimateCost).toHaveBeenCalledWith({
+          supplierId: "s1",
+          channel: "PETALO",
+          quantity: 5,
+        }),
       );
-
-      // supplierId "s2", quantity 3, unitCostUsd 7.5 -> 22.5
-      expect(result.current.estimatedCost).toBe(22.5);
+      await waitFor(() => expect(result.current.estimatedCost).toBe(51.28));
     });
 
-    it("ignores quantity for SMS and just returns unitCostUsd", () => {
+    it("sets isEstimatingCost while the fetch is in flight, and clears it once resolved", async () => {
+      let resolveEstimate: (value: { totalCostUsd: number }) => void;
+      mockEstimateCost.mockReturnValue(
+        new Promise((resolve) => {
+          resolveEstimate = resolve;
+        }),
+      );
       const { wrapper } = createWrapper();
       const { result } = renderHook(
         () =>
@@ -314,15 +317,21 @@ describe("useCampaignForm", () => {
             target: { mode: "edit", campaignId: smsCampaign.id },
             initialCampaign: smsCampaign,
             products: [],
-            mediaCosts,
+            mediaCosts: [],
           }),
         { wrapper },
       );
 
+      await waitFor(() => expect(result.current.isEstimatingCost).toBe(true));
+
+      resolveEstimate!({ totalCostUsd: 15 });
+
+      await waitFor(() => expect(result.current.isEstimatingCost).toBe(false));
       expect(result.current.estimatedCost).toBe(15);
     });
 
-    it("ignores quantity for TIKTOK and just returns unitCostUsd", () => {
+    it("falls back to null when the backend has no cost configured for the supplier/channel pair", async () => {
+      mockEstimateCost.mockRejectedValue(new Error("No cost configured"));
       const { wrapper } = createWrapper();
       const { result } = renderHook(
         () =>
@@ -330,22 +339,12 @@ describe("useCampaignForm", () => {
             target: { mode: "edit", campaignId: tiktokCampaign.id },
             initialCampaign: tiktokCampaign,
             products: [],
-            mediaCosts,
+            mediaCosts: [],
           }),
         { wrapper },
       );
 
-      expect(result.current.estimatedCost).toBe(3);
-    });
-
-    it("returns null when no mediaCosts entry matches supplierId+channel", () => {
-      const { wrapper } = createWrapper();
-      const { result } = renderHook(
-        () =>
-          useCampaignForm({ target: { mode: "create" }, initialCampaign: null, products: [], mediaCosts }),
-        { wrapper },
-      );
-
+      await waitFor(() => expect(result.current.isEstimatingCost).toBe(false));
       expect(result.current.estimatedCost).toBeNull();
     });
   });
@@ -395,6 +394,7 @@ describe("useCampaignForm", () => {
             onBrandsChange={form.onBrandsChange}
             onProductsChange={form.onProductsChange}
             suppliers={[]}
+            availableChannels={form.availableChannels}
             estimatedCost={form.estimatedCost}
             isSubmitting={form.isSubmitting}
             error={form.error}

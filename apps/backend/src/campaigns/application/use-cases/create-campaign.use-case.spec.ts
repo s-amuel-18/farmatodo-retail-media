@@ -32,7 +32,7 @@ const petaloInput: NewCampaignInput = {
 function makeUseCase() {
   const campaignRepository = new InMemoryCampaignRepository();
   const mediaCostRepository = new InMemoryMediaCostRepository([
-    { id: "mc-1", supplierId: "supplier-1", channel: "PETALO", unitCostUsd: 50 },
+    { id: "mc-1", supplierId: "supplier-1", channel: "PETALO", unitCostUsd: 50, pricingModel: "PER_UNIT" },
   ]);
   return { useCase: new CreateCampaignUseCase(campaignRepository, mediaCostRepository), campaignRepository };
 }

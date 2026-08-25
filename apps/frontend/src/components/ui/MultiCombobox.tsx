@@ -96,7 +96,7 @@ export function MultiCombobox({ options, value, onChange, placeholder, emptyMess
         {selected.map((option) => (
           <span
             key={option.value}
-            className="inline-flex items-center gap-1 rounded-pill bg-navy-100 py-0.5 pl-2.5 pr-1 text-xs font-medium text-navy-900"
+            className="inline-flex items-center gap-1 rounded-pill bg-tint py-0.5 pl-2.5 pr-1 text-xs font-medium text-tint-fg"
           >
             {option.label}
             <button
@@ -104,7 +104,7 @@ export function MultiCombobox({ options, value, onChange, placeholder, emptyMess
               aria-label={`Quitar ${option.label}`}
               onClick={(event) => removeChip(option.value, event)}
               disabled={disabled}
-              className="rounded-full p-0.5 text-navy-700 transition-colors hover:bg-navy-900/10 hover:text-navy-900"
+              className="rounded-full p-0.5 text-tint-fg/70 transition-colors hover:bg-tint-fg/10 hover:text-tint-fg"
             >
               <svg viewBox="0 0 12 12" aria-hidden="true" className="h-3 w-3">
                 <path
@@ -159,7 +159,7 @@ export function MultiCombobox({ options, value, onChange, placeholder, emptyMess
                   onClick={() => toggleOption(option.value)}
                   className={clsx(
                     "flex cursor-pointer items-center justify-between px-3 py-1.5 text-sm",
-                    index === highlightedIndex ? "bg-brand-blue-50 text-navy-900" : "text-ink",
+                    index === highlightedIndex ? "bg-highlight text-ink" : "text-ink",
                   )}
                 >
                   {option.label}

@@ -121,11 +121,19 @@ export interface Supplier {
   name: string;
 }
 
+/**
+ * Drives how `calculateTotalCost` turns a unit cost into a total — data the
+ * catalog owns, so the domain layer never has to branch on `ChannelType` to
+ * know whether a channel is billed per unit or as a flat fee.
+ */
+export type PricingModel = "PER_UNIT" | "FLAT";
+
 export interface MediaCost {
   id: string;
   supplierId: string;
   channel: ChannelType;
   unitCostUsd: number;
+  pricingModel: PricingModel;
 }
 
 export interface CampaignListFilters {

@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Class-based dark mode: toggling `.dark` on <html> flips every token below. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
  * Retail Media — Farmatodo design tokens.
  * Navy/blue/gold extracted from the real farmatodo.com.ve (see DESIGN.md);
@@ -29,6 +32,15 @@
   --color-text-muted: #57678a;
   --color-border: #dbe2ee;
 
+  /* Neutral pill pairing (Badge/ToggleChip "neutral" tone, MultiCombobox chips) — kept
+     distinct from the literal navy-100/navy-900 palette swatches so it can invert in
+     dark mode without touching navy-900's structural, header-only role (see DESIGN.md). */
+  --color-tint: #e4e9f5;
+  --color-tint-fg: #0f2450;
+
+  /* MultiCombobox's keyboard-highlighted option row. */
+  --color-highlight: #ecf3fb;
+
   --color-danger-600: #c23a2b;
   --color-danger-50: #fbe9e7;
 
@@ -45,6 +57,41 @@
   --radius-pill: 999px;
 
   --shadow-float: 0 10px 30px -10px rgb(15 36 80 / 0.35);
+}
+
+/*
+ * "Night Watch" — the dark-mode extension of "The Bridge". The header is already
+ * navy, so it barely changes; everything around it dims to match, as if the rest
+ * of the bridge ran on instruments after dark. The One Gold Rule and the One
+ * Shadow Rule still apply — only their values are recalibrated for a dark hull.
+ */
+.dark {
+  --color-canvas: #0a1c40;
+  --color-surface: #192e5a;
+  --color-ink: #e4e9f5;
+  --color-text-muted: #98a5c9;
+  --color-border: #32436c;
+
+  --color-tint: #2a3a63;
+  --color-tint-fg: #e4e9f5;
+
+  --color-highlight: #1c3a5c;
+
+  --color-gold-100: #2e2408;
+
+  --color-danger-600: #ff6b5c;
+  --color-danger-50: #3a140f;
+
+  --color-status-draft-bg: #2a3550;
+  --color-status-draft-fg: #b7c1de;
+  --color-status-pending-bg: #3d2f05;
+  --color-status-pending-fg: #f0c419;
+  --color-status-approved-bg: #0f3324;
+  --color-status-approved-fg: #5fd6a0;
+  --color-status-rejected-bg: #3a140f;
+  --color-status-rejected-fg: #f28b7d;
+
+  --shadow-float: 0 10px 30px -8px rgb(0 0 0 / 0.6);
 }
 
 @layer base {

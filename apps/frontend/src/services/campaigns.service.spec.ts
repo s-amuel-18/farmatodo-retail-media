@@ -74,6 +74,32 @@ describe("campaignsService", () => {
     });
   });
 
+  describe("estimateCost", () => {
+    it("gets /campaigns/cost-estimate with channel, supplierId and quantity in the query string", async () => {
+      const estimate = { totalCostUsd: 42.5 };
+      mockGet.mockResolvedValue(estimate);
+
+      const result = await campaignsService.estimateCost({
+        channel: "PETALO",
+        supplierId: "supplier-1",
+        quantity: 3,
+      });
+
+      expect(mockGet).toHaveBeenCalledWith(
+        "/campaigns/cost-estimate?channel=PETALO&supplierId=supplier-1&quantity=3",
+      );
+      expect(result).toBe(estimate);
+    });
+
+    it("omits quantity from the query string when not provided", async () => {
+      mockGet.mockResolvedValue({ totalCostUsd: 300 });
+
+      await campaignsService.estimateCost({ channel: "SMS", supplierId: "supplier-1" });
+
+      expect(mockGet).toHaveBeenCalledWith("/campaigns/cost-estimate?channel=SMS&supplierId=supplier-1");
+    });
+  });
+
   describe("list / toQueryString", () => {
     const paginated: Paginated<Campaign> = { items: [], nextCursor: null };
 

@@ -3,11 +3,11 @@ import { calculateTotalCost } from "./cost-calculator";
 import { ValidationError } from "./errors";
 
 const mediaCosts: MediaCost[] = [
-  { id: "mc-1", supplierId: "supplier-1", channel: "PETALO", unitCostUsd: 100 },
-  { id: "mc-2", supplierId: "supplier-1", channel: "SMS", unitCostUsd: 250 },
-  { id: "mc-3", supplierId: "supplier-1", channel: "PARRILLERA", unitCostUsd: 60 },
-  { id: "mc-4", supplierId: "supplier-1", channel: "TIKTOK", unitCostUsd: 500 },
-  { id: "mc-5", supplierId: "supplier-2", channel: "PETALO", unitCostUsd: 100 },
+  { id: "mc-1", supplierId: "supplier-1", channel: "PETALO", unitCostUsd: 100, pricingModel: "PER_UNIT" },
+  { id: "mc-2", supplierId: "supplier-1", channel: "SMS", unitCostUsd: 250, pricingModel: "FLAT" },
+  { id: "mc-3", supplierId: "supplier-1", channel: "PARRILLERA", unitCostUsd: 60, pricingModel: "PER_UNIT" },
+  { id: "mc-4", supplierId: "supplier-1", channel: "TIKTOK", unitCostUsd: 500, pricingModel: "FLAT" },
+  { id: "mc-5", supplierId: "supplier-2", channel: "PETALO", unitCostUsd: 100, pricingModel: "PER_UNIT" },
 ];
 
 describe("calculateTotalCost", () => {
@@ -62,7 +62,7 @@ describe("calculateTotalCost", () => {
   it("rounds to 2 decimals", () => {
     const total = calculateTotalCost(
       { channel: "PETALO", supplierId: "supplier-1", quantity: 1 },
-      [{ id: "mc-6", supplierId: "supplier-1", channel: "PETALO", unitCostUsd: 10.005 }],
+      [{ id: "mc-6", supplierId: "supplier-1", channel: "PETALO", unitCostUsd: 10.005, pricingModel: "PER_UNIT" }],
     );
     expect(total).toBe(10.01);
   });
@@ -77,5 +77,21 @@ describe("calculateTotalCost", () => {
     expect(() =>
       calculateTotalCost({ channel: "SMS", supplierId: "supplier-2" }, mediaCosts),
     ).toThrow(ValidationError);
+  });
+
+  it("follows the catalog's pricingModel, not the channel name — a FLAT-priced PETALO entry ignores quantity", () => {
+    const total = calculateTotalCost(
+      { channel: "PETALO", supplierId: "supplier-9", quantity: 7 },
+      [{ id: "mc-7", supplierId: "supplier-9", channel: "PETALO", unitCostUsd: 42, pricingModel: "FLAT" }],
+    );
+    expect(total).toBe(42);
+  });
+
+  it("follows the catalog's pricingModel, not the channel name — a PER_UNIT-priced SMS entry multiplies by quantity", () => {
+    const total = calculateTotalCost(
+      { channel: "SMS", supplierId: "supplier-9", quantity: 4 },
+      [{ id: "mc-8", supplierId: "supplier-9", channel: "SMS", unitCostUsd: 10, pricingModel: "PER_UNIT" }],
+    );
+    expect(total).toBe(40);
   });
 });

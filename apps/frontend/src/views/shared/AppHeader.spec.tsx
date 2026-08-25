@@ -1,6 +1,15 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AppHeader } from "./AppHeader";
+import { ThemeProvider } from "@/view-models/theme/theme-context";
+
+function renderHeader(props: React.ComponentProps<typeof AppHeader>) {
+  return render(
+    <ThemeProvider>
+      <AppHeader {...props} />
+    </ThemeProvider>,
+  );
+}
 
 describe("AppHeader", () => {
   const props = {
@@ -11,7 +20,7 @@ describe("AppHeader", () => {
   };
 
   it("renders the email and role label concatenated", () => {
-    render(<AppHeader {...props} />);
+    renderHeader(props);
 
     expect(
       screen.getByText(
@@ -21,7 +30,7 @@ describe("AppHeader", () => {
   });
 
   it("links the logo to homeHref", () => {
-    render(<AppHeader {...props} />);
+    renderHeader(props);
 
     const link = screen.getByRole("link");
     expect(link).toHaveAttribute("href", "/campaigns");
@@ -30,7 +39,7 @@ describe("AppHeader", () => {
   it("calls onSignOut when Cerrar sesión is clicked", async () => {
     const user = userEvent.setup();
     const onSignOut = jest.fn();
-    render(<AppHeader {...props} onSignOut={onSignOut} />);
+    renderHeader({ ...props, onSignOut });
 
     await user.click(screen.getByRole("button", { name: "Cerrar sesión" }));
 

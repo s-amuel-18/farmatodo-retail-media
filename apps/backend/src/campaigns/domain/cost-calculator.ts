@@ -1,25 +1,25 @@
 import type { ChannelType, MediaCost } from "@farmatodo-retail-media/types";
 import { ValidationError } from "./errors";
 
-export type CostCalculationInput =
-  | { channel: "PETALO"; supplierId: string; quantity: number }
-  | { channel: "PARRILLERA"; supplierId: string; quantity: number }
-  | { channel: "SMS"; supplierId: string }
-  | { channel: "TIKTOK"; supplierId: string };
+export interface CostCalculationInput {
+  channel: ChannelType;
+  supplierId: string;
+  quantity?: number | undefined;
+}
 
 /**
  * Total cost is always derived server-side from the media cost catalog, never
- * trusted from the client. Assumption (documented in the README): the catalog
- * entry is a per-unit cost for PETALO/PARRILLERA (multiplied by how many are
- * contracted) and a flat contracting cost for SMS/TIKTOK — separate from
- * TikTok's own ad-spend `dailyBudgetUsd`, which the provider bills directly.
+ * trusted from the client. Whether the unit cost is multiplied by `quantity`
+ * or charged flat is decided by each catalog entry's `pricingModel` — never
+ * by branching on `channel` here, so adding a new channel or repricing an
+ * existing one is a catalog change, not a code change.
  */
 export function calculateTotalCost(
   input: CostCalculationInput,
   mediaCosts: MediaCost[],
 ): number {
   const mediaCost = findMediaCost(input.supplierId, input.channel, mediaCosts);
-  const quantity = "quantity" in input ? input.quantity : 1;
+  const quantity = mediaCost.pricingModel === "PER_UNIT" ? (input.quantity ?? 0) : 1;
   return round2(mediaCost.unitCostUsd * quantity);
 }
 

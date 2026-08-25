@@ -28,7 +28,7 @@ const tiktokInput: NewCampaignInput = {
 async function setup() {
   const campaignRepository = new InMemoryCampaignRepository();
   const mediaCostRepository = new InMemoryMediaCostRepository([
-    { id: "mc-1", supplierId: "supplier-1", channel: "TIKTOK", unitCostUsd: 500 },
+    { id: "mc-1", supplierId: "supplier-1", channel: "TIKTOK", unitCostUsd: 500, pricingModel: "FLAT" },
   ]);
   const created = await new CreateCampaignUseCase(campaignRepository, mediaCostRepository).execute({
     data: tiktokInput,
